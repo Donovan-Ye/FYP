@@ -1,8 +1,8 @@
-import 'package:first_app/pages/home_page.dart';
-import 'package:first_app/pages/my_page.dart';
-import 'package:first_app/pages/search_page.dart';
+import 'package:fyp_yzj/pages/home/home_page.dart';
+import 'package:fyp_yzj/pages/my/my_page.dart';
+import 'package:fyp_yzj/pages/search/search_page.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/pages/map_page.dart';
+import 'package:fyp_yzj/pages/main/main_page.dart';
 
 class TabNavigator extends StatefulWidget {
   @override
@@ -32,6 +32,7 @@ class _TabNavigatorState extends State<TabNavigator> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        showSelectedLabels: false,
         currentIndex: _currentIndex,
         onTap: (index) {
           _controller.jumpToPage(index);
@@ -41,7 +42,7 @@ class _TabNavigatorState extends State<TabNavigator> {
         },
         items: [
           BottomNavigationBarItem(
-              backgroundColor: Colors.black,
+              backgroundColor: Color(0xff191919),
               icon: Icon(Icons.home, color: _defaultColor),
               activeIcon: Icon(Icons.home, color: _activeColor),
               title: Text('',
@@ -65,7 +66,7 @@ class _TabNavigatorState extends State<TabNavigator> {
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle, color: _defaultColor),
               activeIcon: Icon(Icons.account_circle, color: _activeColor),
-              title: Text('my',
+              title: Text('',
                   style: TextStyle(
                       color:
                           _currentIndex != 3 ? _defaultColor : _activeColor))),

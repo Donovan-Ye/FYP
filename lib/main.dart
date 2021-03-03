@@ -1,6 +1,6 @@
-import 'package:first_app/navigator/tab_navigator.dart';
+import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/pages/welcome_page.dart';
+import 'package:fyp_yzj/pages/welcome/welcome_page.dart';
 
 void main() {
   runApp(MyApp());

@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:first_app/pages/alarm_page.dart';
-import 'package:first_app/pages/sign_up_page.dart';
+import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -40,20 +38,24 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
+        toolbarHeight: 45,
         title: new Text('Patronus'),
         leading: new IconButton(
-            icon: new Icon(Icons.contact_page),
+            icon: new Icon(
+              Icons.contact_page,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.pop(context);
             }),
         centerTitle: true,
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xff191919),
       ),
       body: Column(
         verticalDirection: VerticalDirection.up,
         children: <Widget>[
           Container(
-            color: Colors.white,
+            color: Color(0xff303030),
             padding: EdgeInsets.fromLTRB(3, 10, 3, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -104,8 +106,10 @@ class _MapPageState extends State<MapPage> {
 
   Widget _map_icon(String name, Color color, IconData icon) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-      margin: EdgeInsets.only(right: 5),
+      height: 65,
+      width: 65,
+      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+      margin: EdgeInsets.only(left: 10, right: 10),
       decoration:
           BoxDecoration(borderRadius: BorderRadius.circular(12), color: color),
       child: Column(
@@ -119,12 +123,12 @@ class _MapPageState extends State<MapPage> {
             child: new Icon(
               icon,
               color: Colors.white,
-              size: 50,
+              size: 30,
             ),
           ),
           Text(
             name,
-            style: TextStyle(color: Colors.white, fontSize: 15),
+            style: TextStyle(color: Colors.white, fontSize: 12),
           )
         ],
       ),

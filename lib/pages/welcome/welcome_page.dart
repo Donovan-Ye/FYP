@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:first_app/pages/log_in_page.dart';
-import 'package:first_app/pages/sign_up_page.dart';
+import 'package:fyp_yzj/pages/login/log_in_page.dart';
+import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -11,10 +8,6 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  _log() {
-    print("点击了按钮");
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +15,7 @@ class _WelcomePageState extends State<WelcomePage> {
         body: Column(
           children: <Widget>[
             Container(
-              margin: const EdgeInsets.only(top: 250.0),
+              margin: const EdgeInsets.only(top: 230.0),
               child: Center(
                 child: Text(
                   "Welcome to",
@@ -55,7 +48,7 @@ class _WelcomePageState extends State<WelcomePage> {
               },
               child: Text('Log In', style: TextStyle(fontSize: 25)),
               color: Color(0xff03DAC5),
-              padding: EdgeInsets.fromLTRB(90, 15, 90, 15),
+              padding: EdgeInsets.fromLTRB(90, 12, 90, 12),
               textColor: Colors.white,
             ),
             const SizedBox(height: 20),
@@ -67,7 +60,7 @@ class _WelcomePageState extends State<WelcomePage> {
               },
               child: Text('Sign Up', style: TextStyle(fontSize: 25)),
               color: Color(0xff676a6a),
-              padding: EdgeInsets.fromLTRB(82, 14, 82, 14),
+              padding: EdgeInsets.fromLTRB(82, 12, 82, 12),
               textColor: Colors.white,
             )
           ],

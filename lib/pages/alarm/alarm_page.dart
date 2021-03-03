@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:first_app/navigator/tab_navigator.dart';
+import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:first_app/pages/log_in_page.dart';
-import 'package:first_app/pages/sign_up_page.dart';
+import 'package:fyp_yzj/pages/login/log_in_page.dart';
+import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
 
 class AlarmPage extends StatefulWidget {
   @override
