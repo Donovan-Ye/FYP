@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
+import 'package:get/get.dart';
 
 class WelcomePage extends StatefulWidget {
+  static const String routeName = '/welcome';
+
+  static Route route() {
+    return MaterialPageRoute(
+        settings: const RouteSettings(name: routeName),
+        builder: (_) => WelcomePage());
+  }
+
   @override
   _WelcomePageState createState() => _WelcomePageState();
 }
@@ -42,9 +51,7 @@ class _WelcomePageState extends State<WelcomePage> {
             const SizedBox(height: 40),
             RaisedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return LogInPage();
-                }));
+                Get.toNamed(LogInPage.routeName);
               },
               child: Text('Log In', style: TextStyle(fontSize: 25)),
               color: Color(0xff03DAC5),
@@ -54,9 +61,7 @@ class _WelcomePageState extends State<WelcomePage> {
             const SizedBox(height: 20),
             RaisedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return SignUpPage();
-                }));
+                Get.toNamed(SignUpPage.routeName);
               },
               child: Text('Sign Up', style: TextStyle(fontSize: 25)),
               color: Color(0xff676a6a),

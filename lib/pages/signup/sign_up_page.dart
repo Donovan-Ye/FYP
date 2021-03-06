@@ -1,12 +1,17 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:get/get.dart';
 
 class SignUpPage extends StatefulWidget {
+  static const String routeName = '/signup';
+
+  static Route route() {
+    return MaterialPageRoute(
+        settings: const RouteSettings(name: routeName),
+        builder: (_) => SignUpPage());
+  }
+
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
@@ -28,7 +33,7 @@ class _SignUpPageState extends State<SignUpPage> {
         leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context);
+              Get.back();
             }),
         backgroundColor: Colors.black,
       ),
@@ -52,12 +57,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         gapPadding: 10.0,
                         borderRadius: BorderRadius.circular(20.0),
                         borderSide: BorderSide(
-                          color: Color(0xff03DAC5), // 边框颜色
+                          color: Color(0xff03DAC5),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color(0xff03DAC5), // 边框颜色
+                          color: Color(0xff03DAC5),
                         ),
                       ),
                       filled: true,
@@ -83,12 +88,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         gapPadding: 10.0,
                         borderRadius: BorderRadius.circular(20.0),
                         borderSide: BorderSide(
-                          color: Color(0xff03DAC5), // 边框颜色
+                          color: Color(0xff03DAC5),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color(0xff03DAC5), // 边框颜色
+                          color: Color(0xff03DAC5),
                         ),
                       ),
                       filled: true,
@@ -168,10 +173,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             print(_unameController.text);
                             print(_pwdController.text);
                             if (result.data["updateData"]["status"]) {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return LogInPage();
-                              }));
+                              Get.toNamed(LogInPage.routeName);
                             } else {
                               showDialog(
                                   context: context,
@@ -183,7 +185,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                           new FlatButton(
                                             child: new Text("OK"),
                                             onPressed: () {
-                                              Navigator.of(context).pop();
+                                              Get.back();
                                             },
                                           ),
                                         ],

@@ -5,6 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/main/main_page.dart';
 
 class TabNavigator extends StatefulWidget {
+  static const String routeName = '/main_tab';
+
+  static Route route() {
+    return MaterialPageRoute(
+        settings: const RouteSettings(name: routeName),
+        builder: (_) => TabNavigator());
+  }
+
   @override
   _TabNavigatorState createState() => _TabNavigatorState();
 }

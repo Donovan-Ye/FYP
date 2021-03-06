@@ -1,13 +1,18 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:fyp_yzj/pages/login/widget/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:fyp_yzj/pages/login/widget/text_form_field_widget.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:fyp_yzj/navigator/tab_navigator.dart';
+import 'package:get/get.dart';
 
 class LogInPage extends StatefulWidget {
+  static const String routeName = '/login';
+
+  static Route route() {
+    return MaterialPageRoute(
+        settings: const RouteSettings(name: routeName),
+        builder: (_) => LogInPage());
+  }
+
   @override
   _LogInPageState createState() => _LogInPageState();
 }
@@ -87,7 +92,7 @@ class _LogInPageState extends State<LogInPage> {
       leading: new IconButton(
           icon: new Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
           }),
       backgroundColor: Colors.black,
     );
@@ -110,9 +115,7 @@ class _LogInPageState extends State<LogInPage> {
       print(_unameController.text);
       print(_pwdController.text);
       if (result.data["fetchObjectData"]["status"]) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return TabNavigator();
-        }));
+        Get.toNamed(TabNavigator.routeName);
       } else {
         showDialog(
             context: context,
@@ -123,7 +126,7 @@ class _LogInPageState extends State<LogInPage> {
                     new FlatButton(
                       child: new Text("OK"),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Get.back();
                       },
                     ),
                   ],

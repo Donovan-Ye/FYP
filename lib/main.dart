@@ -1,6 +1,7 @@
-import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/welcome/welcome_page.dart';
+import 'package:get/get.dart';
+import 'package:fyp_yzj/config/fyp_router.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,9 +10,12 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter FYP',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: WelcomePage());
+    return GetMaterialApp(
+      title: 'Flutter FYP',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: FypRouter.generateRoute,
+      initialRoute: WelcomePage.routeName,
+    );
   }
 }
