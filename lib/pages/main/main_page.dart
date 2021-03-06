@@ -2,15 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
+import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
-class MapPage extends StatefulWidget {
+class MainPage extends StatefulWidget {
   @override
-  _MapPageState createState() => _MapPageState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MainPageState extends State<MainPage> {
   GoogleMapController mapController;
 
   void _onMapCreated(GoogleMapController controller) {
@@ -32,6 +33,18 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       // _center = LatLng(res.latitude, res.longitude);
     });
+  }
+
+  void _alarm() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return AlarmPage();
+    }));
+  }
+
+  void _fakeCall() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FakeCallPage();
+    }));
   }
 
   @override
@@ -64,11 +77,13 @@ class _MapPageState extends State<MapPage> {
                   "Alarm",
                   Color(0xffff3d2f),
                   Icons.notifications,
+                  tap: _alarm,
                 ),
                 _map_icon(
                   "Fake",
                   Colors.blue,
                   Icons.call,
+                  tap: _fakeCall,
                 ),
                 _map_icon(
                   "demo",
@@ -104,7 +119,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _map_icon(String name, Color color, IconData icon) {
+  Widget _map_icon(String name, Color color, IconData icon, {Function tap}) {
     return Container(
       height: 65,
       width: 65,
@@ -115,11 +130,7 @@ class _MapPageState extends State<MapPage> {
       child: Column(
         children: [
           GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return AlarmPage();
-              }));
-            },
+            onTap: tap,
             child: new Icon(
               icon,
               color: Colors.white,
