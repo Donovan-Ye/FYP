@@ -3,6 +3,8 @@ import 'package:fyp_yzj/pages/welcome/welcome_page.dart';
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
 import 'package:fyp_yzj/navigator/tab_navigator.dart';
+import 'package:fyp_yzj/pages/fakeCall/fake_call_connecting_page.dart';
+import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
 import 'dart:developer' as developer;
 
 class FypRouter {
@@ -17,6 +19,10 @@ class FypRouter {
         return SignUpPage.route();
       case TabNavigator.routeName:
         return TabNavigator.route();
+      case FakeCallConnectingPage.routeName:
+        return FakeCallConnectingPage.route();
+      case FakeCallPage.routeName:
+        return FakeCallPage.route();
       default:
         return _errorRoute();
     }

@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:fyp_yzj/pages/main/main_page.dart';
+import 'package:fyp_yzj/navigator/tab_navigator.dart';
+import 'package:get/get.dart';
 
 class FakeCallConnectingPage extends StatefulWidget {
+  static const String routeName = '/fake_connect';
+
+  static Route route() {
+    return MaterialPageRoute(
+        settings: const RouteSettings(name: routeName),
+        builder: (_) => FakeCallConnectingPage());
+  }
+
   @override
   _FakeCallPage createState() => _FakeCallPage();
 }
@@ -43,9 +52,7 @@ class _FakeCallPage extends State<FakeCallConnectingPage> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return MainPage();
-              }));
+              Get.toNamed(TabNavigator.routeName);
             },
             child: new Icon(
               icon,
