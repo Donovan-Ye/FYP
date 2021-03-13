@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
-import 'package:fyp_yzj/pages/fakeCall/fake_call_connecting_page.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';

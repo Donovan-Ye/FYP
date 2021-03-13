@@ -1,7 +1,9 @@
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
+import 'package:fyp_yzj/pages/emailVerificationCode/verification_code_page.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:get/get.dart';
+import 'package:fyp_yzj/config/graphqlClient.dart';
 
 class SignUpPage extends StatefulWidget {
   static const String routeName = '/signup';
@@ -15,9 +17,6 @@ class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
-
-final _uri = 'http://18.234.144.225:4000/graphql';
-final client = GraphQLClient(cache: InMemoryCache(), link: HttpLink(uri: _uri));
 
 class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _emailController = new TextEditingController();
@@ -155,7 +154,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         textColor: Colors.white,
                         onPressed: () async {
                           if ((_formKey.currentState as FormState).validate()) {
-                            final result = await client
+                            final result = await GraphqlClient.getNewClient()
                                 .mutate(MutationOptions(documentNode: gql('''
                                 mutation updateData(\$un: String!, \$pw: String!,\$em: String!) {
                                   updateData(username: \$un, password: \$pw, email: \$em) {
@@ -164,16 +163,24 @@ class _SignUpPageState extends State<SignUpPage> {
                                   }
                                 }
                               '''), variables: {
-                              'un': _unameController.text,
-                              'pw': _pwdController.text,
+                              'un': _unameController.text.trim(),
+                              'pw': _pwdController.text.trim(),
                               'em': _emailController.text
                             }));
                             if (result.hasException) throw result.exception;
                             print(result.data);
+                            print(_emailController.text.trim());
                             print(_unameController.text);
                             print(_pwdController.text);
                             if (result.data["updateData"]["status"]) {
-                              Get.toNamed(LogInPage.routeName);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => VerificationCodePage(
+                                    email: _emailController.text.trim(),
+                                  ),
+                                ),
+                              );
                             } else {
                               showDialog(
                                   context: context,
