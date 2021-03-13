@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:get/get.dart';
+import 'package:fyp_yzj/config/graphqlClient.dart';
 
 class LogInPage extends StatefulWidget {
   static const String routeName = '/login';
@@ -16,9 +17,6 @@ class LogInPage extends StatefulWidget {
   @override
   _LogInPageState createState() => _LogInPageState();
 }
-
-final _uri = 'http://18.234.144.225:4000/graphql';
-final client = GraphQLClient(cache: InMemoryCache(), link: HttpLink(uri: _uri));
 
 class _LogInPageState extends State<LogInPage> {
   TextEditingController _unameController = new TextEditingController();
@@ -100,7 +98,7 @@ class _LogInPageState extends State<LogInPage> {
 
   void _login() async {
     if ((_formKey.currentState as FormState).validate()) {
-      final result = await client.query(QueryOptions(
+      final result = await GraphqlClient.getNewClient().query(QueryOptions(
           documentNode: gql('''
                                 query fetchObjectData(\$un: String!, \$pw: String!) {
                                   fetchObjectData(username: \$un, password: \$pw) {
@@ -109,7 +107,10 @@ class _LogInPageState extends State<LogInPage> {
                                   }
                                 }
                               '''),
-          variables: {'un': _unameController.text, 'pw': _pwdController.text}));
+          variables: {
+            'un': _unameController.text.trim(),
+            'pw': _pwdController.text.trim()
+          }));
       if (result.hasException) throw result.exception;
       print(result.data);
       print(_unameController.text);

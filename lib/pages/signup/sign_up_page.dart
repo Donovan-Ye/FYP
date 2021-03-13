@@ -165,7 +165,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               '''), variables: {
                               'un': _unameController.text.trim(),
                               'pw': _pwdController.text.trim(),
-                              'em': _emailController.text
+                              'em': _emailController.text.trim()
                             }));
                             if (result.hasException) throw result.exception;
                             print(result.data);
