@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
 import 'package:get/get.dart';
+import 'package:fyp_yzj/widget/text_divider.dart';
 
 class WelcomePage extends StatefulWidget {
   static const String routeName = '/welcome';
@@ -55,23 +56,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   borderRadius: BorderRadius.circular(6)),
             ),
             const SizedBox(height: 40),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Divider(
-                  height: 30,
-                  color: Color(0xff202020),
-                  thickness: 2,
-                  indent: 5,
-                  endIndent: 5,
-                ),
-                Text(
-                  "OR",
-                  style: TextStyle(color: Color(0xff898989)),
-                  textAlign: TextAlign.center,
-                )
-              ],
-            ),
+            TextDivider(content: "OR"),
             const SizedBox(height: 20),
             Container(
               child: GestureDetector(
