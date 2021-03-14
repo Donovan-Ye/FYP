@@ -75,7 +75,6 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
             textColor: Colors.white,
             onPressed: () async {
               if (verfificationCode.length == 4) {
-                print('hi');
                 final result = await GraphqlClient.getNewClient()
                     .query(QueryOptions(documentNode: gql('''
                   query verifyCode(\$em: String!,\$cd:String!){

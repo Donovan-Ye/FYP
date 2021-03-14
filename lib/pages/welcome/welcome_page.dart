@@ -38,36 +38,53 @@ class _WelcomePageState extends State<WelcomePage> {
             ),
             Container(
               child: Center(
-                child: Text(
-                  "Patronus",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 50),
-                ),
-              ),
+                  child: Image(
+                image: AssetImage("assets/images/icon/icon_white.png"),
+              )),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 100),
             RaisedButton(
               onPressed: () {
                 Get.toNamed(LogInPage.routeName);
               },
-              child: Text('Log In', style: TextStyle(fontSize: 25)),
-              color: Color(0xff03DAC5),
-              padding: EdgeInsets.fromLTRB(90, 12, 90, 12),
+              child: Text('Log In', style: TextStyle(fontSize: 18)),
+              color: Color(0xff008AF3),
+              padding: EdgeInsets.fromLTRB(160, 15, 160, 15),
               textColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
+            ),
+            const SizedBox(height: 40),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Divider(
+                  height: 30,
+                  color: Color(0xff202020),
+                  thickness: 2,
+                  indent: 5,
+                  endIndent: 5,
+                ),
+                Text(
+                  "OR",
+                  style: TextStyle(color: Color(0xff898989)),
+                  textAlign: TextAlign.center,
+                )
+              ],
             ),
             const SizedBox(height: 20),
-            RaisedButton(
-              onPressed: () {
-                Get.toNamed(SignUpPage.routeName);
-              },
-              child: Text('Sign Up', style: TextStyle(fontSize: 25)),
-              color: Color(0xff676a6a),
-              padding: EdgeInsets.fromLTRB(82, 12, 82, 12),
-              textColor: Colors.white,
-            )
+            Container(
+              child: GestureDetector(
+                child: Text(
+                  "Sign up with email",
+                  style: TextStyle(color: Color(0xff304F9D), fontSize: 15),
+                  textAlign: TextAlign.center,
+                ),
+                onTap: () {
+                  Get.toNamed(SignUpPage.routeName);
+                },
+              ),
+            ),
           ],
         ));
   }
