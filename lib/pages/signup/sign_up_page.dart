@@ -1,9 +1,10 @@
-import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:fyp_yzj/pages/emailVerificationCode/verification_code_page.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:get/get.dart';
 import 'package:fyp_yzj/config/graphqlClient.dart';
+import 'package:fyp_yzj/widget/text_form_field.dart';
+import 'package:fyp_yzj/pages/signup/widget/log_in_reminder.dart';
 
 class SignUpPage extends StatefulWidget {
   static const String routeName = '/signup';
@@ -38,124 +39,82 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       backgroundColor: Colors.black,
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-        child: Form(
-          key: _formKey, //设置globalKey，用于后面获取FormState
-          autovalidate: true, //开启自动校验
-          child: Column(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 24.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: _getSignUpMainArea(),
+            ),
+            LogInReminder()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getSignUpMainArea() {
+    return Form(
+      key: _formKey, //设置globalKey，用于后面获取FormState
+      autovalidate: true, //开启自动校验
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 20),
+          TextFormFieldWidget(
+            controller: _emailController,
+            labelText: "Email",
+            hintText: "Email",
+            icon: Icon(Icons.email, color: Colors.white),
+            vali: (v) {
+              RegExp emailReg = new RegExp(
+                  r"^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$");
+              return emailReg.hasMatch(v) ? null : "Email format is wrong";
+            },
+          ),
+          const SizedBox(height: 10),
+          TextFormFieldWidget(
+            controller: _unameController,
+            labelText: "Username",
+            hintText: "Username",
+            icon: Icon(Icons.person, color: Colors.white),
+            vali: (v) {
+              return v.trim().length > 0 ? null : "Username can not be empty";
+            },
+          ),
+          const SizedBox(height: 10),
+          TextFormFieldWidget(
+            controller: _pwdController,
+            labelText: "Password",
+            hintText: "password",
+            icon: Icon(Icons.lock, color: Colors.white),
+            vali: (v) {
+              return v.trim().length > 5
+                  ? null
+                  : "password should not less then 5";
+            },
+          ),
+          const SizedBox(height: 10),
+          Row(
             children: <Widget>[
-              const SizedBox(height: 40),
-              TextFormField(
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  autofocus: true,
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        gapPadding: 10.0,
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: BorderSide(
-                          color: Color(0xff03DAC5),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xff03DAC5),
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Color(0xff2d2d2d),
-                      labelText: "Email",
-                      labelStyle: TextStyle(fontSize: 15, color: Colors.white),
-                      hintText: "Email",
-                      icon: Icon(Icons.email, color: Colors.white)),
-                  validator: (v) {
-                    return v.trim().length > 0
-                        ? null
-                        : "Username can not be empty";
-                  }),
-              const SizedBox(height: 30),
-              TextFormField(
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  autofocus: true,
-                  controller: _unameController,
-                  decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        gapPadding: 10.0,
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: BorderSide(
-                          color: Color(0xff03DAC5),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xff03DAC5),
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Color(0xff2d2d2d),
-                      labelText: "Username",
-                      labelStyle: TextStyle(fontSize: 15, color: Colors.white),
-                      hintText: "Username",
-                      icon: Icon(Icons.person, color: Colors.white)),
-                  validator: (v) {
-                    return v.trim().length > 0
-                        ? null
-                        : "Username can not be empty";
-                  }),
-              const SizedBox(height: 30),
-              TextFormField(
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  controller: _pwdController,
-                  decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        gapPadding: 10.0,
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: BorderSide(
-                          color: Color(0xff03DAC5), // 边框颜色
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xff03DAC5), // 边框颜色
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Color(0xff2d2d2d),
-                      labelText: "Password",
-                      labelStyle: TextStyle(fontSize: 15, color: Colors.white),
-                      hintText: "Password",
-                      icon: Icon(Icons.lock, color: Colors.white)),
-                  obscureText: true,
-                  validator: (v) {
-                    return v.trim().length > 5
-                        ? null
-                        : "password should not less then 5";
-                  }),
-              // 登录按钮
-              const SizedBox(height: 30),
-              Text("Trouble logging in?",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(color: Color(0xff03DAC5))),
-              Padding(
-                padding: const EdgeInsets.only(top: 28.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: RaisedButton(
-                        padding: EdgeInsets.all(15.0),
-                        child: Text("Sign Up"),
-                        color: Color(0xff03DAC5),
-                        textColor: Colors.white,
-                        onPressed: () async {
-                          if ((_formKey.currentState as FormState).validate()) {
-                            final result = await GraphqlClient.getNewClient()
-                                .mutate(MutationOptions(documentNode: gql('''
+              Expanded(
+                child: RaisedButton(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text("Sign Up"),
+                  color: Color(0xff008AF3),
+                  textColor: Colors.white,
+                  onPressed: _signUp,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _signUp() async {
+    if ((_formKey.currentState as FormState).validate()) {
+      final result = await GraphqlClient.getNewClient()
+          .mutate(MutationOptions(documentNode: gql('''
                                 mutation updateData(\$un: String!, \$pw: String!,\$em: String!) {
                                   updateData(username: \$un, password: \$pw, email: \$em) {
                                     status
@@ -163,52 +122,40 @@ class _SignUpPageState extends State<SignUpPage> {
                                   }
                                 }
                               '''), variables: {
-                              'un': _unameController.text.trim(),
-                              'pw': _pwdController.text.trim(),
-                              'em': _emailController.text.trim()
-                            }));
-                            if (result.hasException) throw result.exception;
-                            print(result.data);
-                            print(_emailController.text.trim());
-                            print(_unameController.text);
-                            print(_pwdController.text);
-                            if (result.data["updateData"]["status"]) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => VerificationCodePage(
-                                    email: _emailController.text.trim(),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                        title: Text('Error!'),
-                                        content: Text(result.data["updateData"]
-                                            ["message"]),
-                                        actions: <Widget>[
-                                          new FlatButton(
-                                            child: new Text("OK"),
-                                            onPressed: () {
-                                              Get.back();
-                                            },
-                                          ),
-                                        ],
-                                      ));
-                            }
-                          }
-                        },
-                      ),
+        'un': _unameController.text.trim(),
+        'pw': _pwdController.text.trim(),
+        'em': _emailController.text.trim()
+      }));
+      if (result.hasException) throw result.exception;
+      print(result.data);
+      print(_emailController.text.trim());
+      print(_unameController.text);
+      print(_pwdController.text);
+      if (result.data["updateData"]["status"]) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificationCodePage(
+              email: _emailController.text.trim(),
+            ),
+          ),
+        );
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text('Error!'),
+                  content: Text(result.data["updateData"]["message"]),
+                  actions: <Widget>[
+                    new FlatButton(
+                      child: new Text("OK"),
+                      onPressed: () {
+                        Get.back();
+                      },
                     ),
                   ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                ));
+      }
+    }
   }
 }

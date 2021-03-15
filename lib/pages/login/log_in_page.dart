@@ -1,4 +1,4 @@
-import 'package:fyp_yzj/pages/login/widget/text_form_field_widget.dart';
+import 'package:fyp_yzj/widget/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:fyp_yzj/navigator/tab_navigator.dart';
@@ -40,7 +40,7 @@ class _LogInPageState extends State<LogInPage> {
                 "Trouble logging in?",
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   color: Color(0xff008AF3),
                 ),
               ),
@@ -78,22 +78,19 @@ class _LogInPageState extends State<LogInPage> {
             },
           ),
           const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.only(top: 0.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: RaisedButton(
-                      child: Text('Log In', style: TextStyle(fontSize: 18)),
-                      color: Color(0xff008AF3),
-                      padding: EdgeInsets.fromLTRB(140, 14, 140, 14),
-                      textColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6)),
-                      onPressed: _login),
-                ),
-              ],
-            ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: RaisedButton(
+                    child: Text('Log In', style: TextStyle(fontSize: 18)),
+                    color: Color(0xff008AF3),
+                    padding: EdgeInsets.fromLTRB(140, 14, 140, 14),
+                    textColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6)),
+                    onPressed: _login),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           TextDivider(content: "OR"),
