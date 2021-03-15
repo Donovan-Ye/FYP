@@ -4,6 +4,8 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:get/get.dart';
 import 'package:fyp_yzj/config/graphqlClient.dart';
+import 'package:fyp_yzj/widget/text_divider.dart';
+import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
 
 class LogInPage extends StatefulWidget {
   static const String routeName = '/login';
@@ -28,58 +30,87 @@ class _LogInPageState extends State<LogInPage> {
       appBar: _getAppBar(),
       backgroundColor: Colors.black,
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-        child: Form(
-          key: _formKey,
-          autovalidate: true,
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 24.0),
           child: Column(
-            children: <Widget>[
-              const SizedBox(height: 40),
-              TextFormFieldWidget(
-                controller: _unameController,
-                labelText: "Username",
-                hintText: "username",
-                icon: Icon(Icons.person, color: Colors.white),
-                vali: (v) {
-                  return v.trim().length > 0
-                      ? null
-                      : "Username can not be empty";
-                },
+            children: [
+              Expanded(
+                child: _getLogInMainWidget(),
               ),
-              const SizedBox(height: 30),
-              TextFormFieldWidget(
-                controller: _pwdController,
-                labelText: "Password",
-                hintText: "password",
-                icon: Icon(Icons.lock, color: Colors.white),
-                vali: (v) {
-                  return v.trim().length > 5
-                      ? null
-                      : "password should not less then 5";
-                },
-              ),
-              const SizedBox(height: 30),
-              Text("Trouble logging in?",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(color: Color(0xff03DAC5))),
-              Padding(
-                padding: const EdgeInsets.only(top: 28.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: RaisedButton(
-                          padding: EdgeInsets.all(15.0),
-                          child: Text("Log in"),
-                          color: Color(0xff03DAC5),
-                          textColor: Colors.white,
-                          onPressed: _login),
-                    ),
-                  ],
+              Text(
+                "Trouble logging in?",
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Color(0xff008AF3),
                 ),
               ),
             ],
+          )),
+    );
+  }
+
+  Widget _getLogInMainWidget() {
+    return Form(
+      key: _formKey,
+      autovalidate: true,
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 20),
+          TextFormFieldWidget(
+            controller: _unameController,
+            labelText: "Username",
+            hintText: "username",
+            icon: Icon(Icons.person, color: Colors.white),
+            vali: (v) {
+              return v.trim().length > 0 ? null : "Username can not be empty";
+            },
           ),
-        ),
+          const SizedBox(height: 10),
+          TextFormFieldWidget(
+            controller: _pwdController,
+            labelText: "Password",
+            hintText: "password",
+            icon: Icon(Icons.lock, color: Colors.white),
+            vali: (v) {
+              return v.trim().length > 5
+                  ? null
+                  : "password should not less then 5";
+            },
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(top: 0.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: RaisedButton(
+                      child: Text('Log In', style: TextStyle(fontSize: 18)),
+                      color: Color(0xff008AF3),
+                      padding: EdgeInsets.fromLTRB(140, 14, 140, 14),
+                      textColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      onPressed: _login),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextDivider(content: "OR"),
+          const SizedBox(height: 15),
+          Container(
+            child: GestureDetector(
+              child: Text(
+                "Don't have account? Sign up",
+                style: TextStyle(color: Color(0xff008AF3), fontSize: 15),
+                textAlign: TextAlign.center,
+              ),
+              onTap: () {
+                Get.toNamed(SignUpPage.routeName);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -22,19 +22,19 @@ class TextFormFieldWidget extends StatelessWidget {
       style: TextStyle(
         color: Colors.white,
       ),
-      autofocus: true,
+      autofocus: false,
       controller: controller,
       decoration: InputDecoration(
           border: new OutlineInputBorder(
             gapPadding: 10.0,
             borderRadius: BorderRadius.circular(20.0),
             borderSide: BorderSide(
-              color: Color(0xff03DAC5),
+              color: Color(0xff008AF3),
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Color(0xff03DAC5),
+              color: Color(0xff008AF3),
             ),
           ),
           filled: true,
