@@ -1,4 +1,3 @@
-import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:get/get.dart';
@@ -49,7 +48,7 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
               fontSize: 15,
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 25),
           Container(
             height: 60,
             child: VerificationBox(
@@ -64,15 +63,28 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
               },
             ),
           ),
+          SizedBox(height: 5),
+          Container(
+            alignment: Alignment.bottomRight,
+            padding: EdgeInsets.only(right: 18),
+            child: Text(
+              "resend",
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Color(0xff008AF3),
+                fontSize: 15,
+              ),
+            ),
+          ),
           SizedBox(height: 20),
           RaisedButton(
-            padding: EdgeInsets.fromLTRB(170, 15, 170, 15),
-            child: Text(
-              "Go",
-              style: TextStyle(fontSize: 15),
-            ),
-            color: Color(0xff03DAC5),
+            child: Text('Go', style: TextStyle(fontSize: 18)),
+            color: Color(0xff008AF3),
+            padding: EdgeInsets.fromLTRB(166, 14, 166, 14),
             textColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
             onPressed: () async {
               if (verfificationCode.length == 4) {
                 final result = await GraphqlClient.getNewClient()
