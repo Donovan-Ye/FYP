@@ -7,9 +7,12 @@ import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fyp_yzj/pages/main/picker_data.dart';
-import 'package:floatingpanel/floatingpanel.dart';
 import 'package:fyp_yzj/pages/countdown/countdown_page.dart';
 import 'package:get/get.dart';
+import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:fyp_yzj/pages/main/widget/map_feature_icon.dart';
+import 'package:fyp_yzj/pages/main/widget/floating_icons.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -21,24 +24,130 @@ class _MainPageState extends State<MainPage> {
 
   GoogleMapController mapController;
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
+  String _mapStyle;
 
   Position position;
+
+  Set<Marker> _markers = {};
+
   LatLng _center = const LatLng(52.261268, -7.150473);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     getCurrentLocation();
+
+    rootBundle.loadString('assets/map/map_style.txt').then((string) {
+      _mapStyle = string;
+    });
+
+    BitmapDescriptor customIcon;
+
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
+            'assets/images/icon/icon_white.png')
+        .then((d) {
+      customIcon = d;
+
+      _markers.add(Marker(
+        markerId: MarkerId(_center.toString()),
+        position: _center,
+        infoWindow: InfoWindow(
+          title: 'I am here',
+        ),
+        icon: customIcon,
+      ));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      body: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              Expanded(
+                child: GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: _center,
+                    zoom: 11.0,
+                  ),
+                  markers: _markers,
+                ),
+              ),
+              Container(
+                height: 60,
+                color: Color(0xff102439),
+              )
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+            child: FloatingIcons(),
+          )
+        ],
+      ),
+      floatingActionButton: FabCircularMenu(
+        alignment: Alignment.bottomLeft,
+        fabColor: Colors.white,
+        fabOpenColor: Colors.black,
+        fabMargin: EdgeInsets.fromLTRB(0, 0, 10, 100),
+        fabOpenIcon: Icon(
+          Icons.menu,
+          color: Colors.black,
+        ),
+        fabCloseIcon: Icon(
+          Icons.close,
+          color: Colors.white,
+        ),
+        ringColor: Color(0xff202A30),
+        children: <Widget>[
+          MapFeatureIcon(
+            name: "Alarm",
+            color: Color(0xffcc0000),
+            icon: Icons.notifications,
+            context: context,
+            tap: _alarm,
+          ),
+          MapFeatureIcon(
+            name: "Fake",
+            color: Color(0xff3333cc),
+            icon: Icons.call,
+            context: context,
+            tap: () {
+              showPickerArray(context);
+            },
+          ),
+          MapFeatureIcon(
+            name: "demo",
+            color: Colors.blue,
+            icon: Icons.brightness_high,
+            context: context,
+          ),
+          MapFeatureIcon(
+            name: "demo",
+            color: Colors.blue,
+            icon: Icons.screen_rotation,
+            context: context,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+    mapController.setMapStyle(_mapStyle);
   }
 
   void getCurrentLocation() async {
     Position res = await Geolocator.getCurrentPosition();
     setState(() {
-      // _center = LatLng(res.latitude, res.longitude);
+      _center = LatLng(res.latitude, res.longitude);
     });
   }
 
@@ -88,122 +197,5 @@ class _MainPageState extends State<MainPage> {
             int.parse(picker.getSelectedValues()[2]),
           );
         }).showDialog(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: new AppBar(
-          toolbarHeight: 45,
-          title: new Text('Patronus'),
-          leading: new IconButton(
-              icon: new Icon(
-                Icons.contact_page,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          centerTitle: true,
-          backgroundColor: Color(0xff191919),
-        ),
-        body: Stack(
-          children: [
-            Column(
-              verticalDirection: VerticalDirection.up,
-              children: <Widget>[
-                Container(
-                  color: Color(0xff303030),
-                  padding: EdgeInsets.fromLTRB(3, 10, 3, 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _map_icon(
-                        "Alarm",
-                        Color(0xffff3d2f),
-                        Icons.notifications,
-                        context,
-                        tap: _alarm,
-                      ),
-                      _map_icon(
-                        "Fake",
-                        Colors.blue,
-                        Icons.call,
-                        context,
-                        tap: () {
-                          showPickerArray(context);
-                        },
-                      ),
-                      _map_icon(
-                        "demo",
-                        Colors.blue,
-                        Icons.brightness_high,
-                        context,
-                      ),
-                      _map_icon(
-                        "demo",
-                        Colors.blue,
-                        Icons.screen_rotation,
-                        context,
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: GoogleMap(
-                    onMapCreated: _onMapCreated,
-                    markers: <Marker>[
-                      Marker(
-                          markerId: MarkerId("me"),
-                          position: _center,
-                          icon: BitmapDescriptor.defaultMarker,
-                          infoWindow: InfoWindow(title: "me"))
-                    ].toSet(),
-                    initialCameraPosition: CameraPosition(
-                      target: _center,
-                      zoom: 11.0,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            FloatBoxPanel(buttons: [
-              // Add Icons to the buttons list.
-              Icons.message,
-              Icons.photo_camera,
-              Icons.video_library
-            ])
-          ],
-        ));
-  }
-
-  Widget _map_icon(
-      String name, Color color, IconData icon, BuildContext context,
-      {Function tap}) {
-    return Container(
-      height: 65,
-      width: 65,
-      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-      margin: EdgeInsets.only(left: 10, right: 10),
-      decoration:
-          BoxDecoration(borderRadius: BorderRadius.circular(12), color: color),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: tap,
-            child: new Icon(
-              icon,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-          Text(
-            name,
-            style: TextStyle(color: Colors.white, fontSize: 12),
-          )
-        ],
-      ),
-    );
   }
 }
