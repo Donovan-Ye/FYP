@@ -5,10 +5,8 @@ import 'package:fyp_yzj/bloc/countdown/timer_bloc.dart';
 import 'package:fyp_yzj/bloc/countdown/timer_event.dart';
 import 'package:fyp_yzj/bloc/countdown/timer_state.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
-import 'package:wave/wave.dart';
-import 'package:wave/config.dart';
-import 'package:fyp_yzj/pages/fakeCall/fake_call_connecting_page.dart';
 import 'package:get/get.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class CountdownPage extends StatelessWidget {
   final int hour;
@@ -35,10 +33,8 @@ class CountdownPage extends StatelessWidget {
 class Timer extends StatelessWidget {
   final int duration;
 
-  static const TextStyle timerTextStyle = TextStyle(
-    fontSize: 60,
-    fontWeight: FontWeight.bold,
-  );
+  static const TextStyle timerTextStyle =
+      TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white);
 
   const Timer({Key key, this.duration}) : super(key: key);
 
@@ -52,7 +48,7 @@ class Timer extends StatelessWidget {
         children: [
           Background(),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Padding(
@@ -80,6 +76,9 @@ class Timer extends StatelessWidget {
                     },
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 150,
               ),
               BlocBuilder<TimerBloc, TimerState>(
                 buildWhen: (previousState, currentState) =>
@@ -121,7 +120,12 @@ class Actions extends StatelessWidget {
     if (currentState is TimerInitial) {
       return [
         FloatingActionButton(
-          child: Icon(Icons.play_arrow),
+          backgroundColor: Color(0xff212121),
+          child: Icon(
+            Icons.play_arrow,
+            size: 30,
+            color: Color(0xff1561CD),
+          ),
           onPressed: () =>
               timerBloc.add(TimerStarted(duration: currentState.duration)),
         ),
@@ -130,11 +134,21 @@ class Actions extends StatelessWidget {
     if (currentState is TimerRunInProgress) {
       return [
         FloatingActionButton(
-          child: Icon(Icons.pause),
+          backgroundColor: Color(0xff212121),
+          child: Icon(
+            Icons.pause,
+            size: 30,
+            color: Color(0xff1561CD),
+          ),
           onPressed: () => timerBloc.add(TimerPaused()),
         ),
         FloatingActionButton(
-          child: Icon(Icons.replay),
+          backgroundColor: Color(0xff212121),
+          child: Icon(
+            Icons.replay,
+            size: 30,
+            color: Color(0xff1561CD),
+          ),
           onPressed: () => timerBloc.add(TimerReset()),
         ),
       ];
@@ -142,11 +156,21 @@ class Actions extends StatelessWidget {
     if (currentState is TimerRunPause) {
       return [
         FloatingActionButton(
-          child: Icon(Icons.play_arrow),
+          backgroundColor: Color(0xff212121),
+          child: Icon(
+            Icons.play_arrow,
+            size: 30,
+            color: Color(0xff1561CD),
+          ),
           onPressed: () => timerBloc.add(TimerResumed()),
         ),
         FloatingActionButton(
-          child: Icon(Icons.replay),
+          backgroundColor: Color(0xff212121),
+          child: Icon(
+            Icons.replay,
+            size: 30,
+            color: Color(0xff1561CD),
+          ),
           onPressed: () => timerBloc.add(TimerReset()),
         ),
       ];
@@ -162,33 +186,8 @@ class Actions extends StatelessWidget {
 class Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return WaveWidget(
-      config: CustomConfig(
-        gradients: [
-          [
-            Color.fromRGBO(72, 74, 126, 1),
-            Color.fromRGBO(125, 170, 206, 1),
-            Color.fromRGBO(184, 189, 245, 0.7)
-          ],
-          [
-            Color.fromRGBO(72, 74, 126, 1),
-            Color.fromRGBO(125, 170, 206, 1),
-            Color.fromRGBO(172, 182, 219, 0.7)
-          ],
-          [
-            Color.fromRGBO(72, 73, 126, 1),
-            Color.fromRGBO(125, 170, 206, 1),
-            Color.fromRGBO(190, 238, 246, 0.7)
-          ],
-        ],
-        durations: [19440, 10800, 6000],
-        heightPercentages: [0.03, 0.01, 0.02],
-        gradientBegin: Alignment.bottomCenter,
-        gradientEnd: Alignment.topCenter,
-      ),
-      size: Size(double.infinity, double.infinity),
-      waveAmplitude: 25,
-      backgroundColor: Colors.blue[50],
+    return Container(
+      color: Colors.black,
     );
   }
 }
