@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_connecting_page.dart';
 import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:get/get.dart';
+import 'package:audioplayer/audioplayer.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 class FakeCallPage extends StatefulWidget {
   static const String routeName = '/fake_call';
@@ -17,12 +22,13 @@ class FakeCallPage extends StatefulWidget {
 }
 
 class _FakeCallPage extends State<FakeCallPage> {
-  void _dcline() {
-    Get.toNamed(TabNavigator.routeName);
-  }
+  AudioPlayer audioPlayer = AudioPlayer();
 
-  void _accept() {
-    Get.toNamed(FakeCallConnectingPage.routeName);
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _playRing();
   }
 
   @override
@@ -59,6 +65,35 @@ class _FakeCallPage extends State<FakeCallPage> {
         ),
       ),
     );
+  }
+
+  void _dcline() async {
+    await audioPlayer.stop();
+
+    Get.toNamed(TabNavigator.routeName);
+  }
+
+  void _accept() async {
+    await audioPlayer.stop();
+
+    Get.toNamed(FakeCallConnectingPage.routeName);
+  }
+
+  void _playRing() async {
+    final bundleDir = 'assets/audio';
+    final assetName = 'call_sound.mp3';
+    final localDir = await getApplicationDocumentsDirectory();
+    final localAssetFile = await copyLocalAsset(localDir, bundleDir, assetName);
+    await audioPlayer.play(localAssetFile.path, isLocal: true);
+  }
+
+  Future<File> copyLocalAsset(
+      Directory localDir, String bundleDir, String assetName) async {
+    final data = await rootBundle.load('$bundleDir/$assetName');
+    final bytes = data.buffer.asUint8List();
+    final localAssetFile = File('${localDir.path}/$assetName');
+    await localAssetFile.writeAsBytes(bytes, flush: true);
+    return localAssetFile;
   }
 
   Widget _fakeCallButton(Color color, IconData icon, Function tap) {

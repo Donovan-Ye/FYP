@@ -54,6 +54,8 @@ dependencies:
   aws_s3: ^0.1.1+hotfix.5
   easy_dialog: ^1.0.5
   flutter_easyloading: ^3.0.0
+
+  audioplayer: ^0.8.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +78,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/audio/call_sound.mp3
     - assets/images/fakeCall/
     - assets/images/icon/
     - assets/map/map_style.txt
