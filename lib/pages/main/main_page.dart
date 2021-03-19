@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
+import 'package:fyp_yzj/pages/main/generate_image_url.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fyp_yzj/pages/main/picker_data.dart';
@@ -13,6 +15,12 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:fyp_yzj/pages/main/widget/map_feature_icon.dart';
 import 'package:fyp_yzj/pages/main/widget/floating_icons.dart';
+import 'package:fyp_yzj/pages/video/video_page.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:fyp_yzj/pages/main/upload_file.dart';
+import 'package:easy_dialog/easy_dialog.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -20,6 +28,9 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final ImagePicker _picker = ImagePicker();
+  PickedFile _imageFile;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   GoogleMapController mapController;
@@ -127,16 +138,91 @@ class _MainPageState extends State<MainPage> {
             color: Colors.blue,
             icon: Icons.brightness_high,
             context: context,
+            tap: () {},
           ),
           MapFeatureIcon(
-            name: "demo",
+            name: "Video",
             color: Colors.blue,
-            icon: Icons.screen_rotation,
+            icon: Icons.video_call,
             context: context,
+            tap: () async {
+              final PickedFile file = await _picker.getVideo(
+                  source: ImageSource.camera,
+                  maxDuration: Duration(seconds: 300));
+              if (file != null) {
+                EasyLoading.show(status: 'Uploading...');
+              }
+
+              GenerateImageUrl generateImageUrl = GenerateImageUrl();
+              await generateImageUrl.call(".mp4");
+
+              String uploadUrl;
+              String downloadUrl;
+              if (generateImageUrl.isGenerated != null &&
+                  generateImageUrl.isGenerated) {
+                uploadUrl = generateImageUrl.uploadUrl;
+                downloadUrl = generateImageUrl.downloadUrl;
+                print(uploadUrl);
+                print(downloadUrl);
+              } else {
+                throw generateImageUrl.message;
+              }
+
+              bool isUploaded =
+                  await _uploadFile(context, uploadUrl, File(file.path));
+
+              EasyLoading.dismiss();
+              if (isUploaded) {
+                EasyDialog(
+                  title: Text(
+                    "Success",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textScaleFactor: 1.2,
+                  ),
+                  description: Text(
+                    "Upload successfully.",
+                    textScaleFactor: 1.1,
+                    textAlign: TextAlign.center,
+                  ),
+                ).show(context);
+              } else {
+                EasyDialog(
+                  title: Text(
+                    "Error",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textScaleFactor: 1.2,
+                  ),
+                  description: Text(
+                    "Uploading failed. Please check your internet.",
+                    textScaleFactor: 1.1,
+                    textAlign: TextAlign.center,
+                  ),
+                ).show(context);
+              }
+
+              setState(() {
+                _imageFile = file;
+              });
+            },
           ),
         ],
       ),
     );
+  }
+
+  Future<bool> _uploadFile(context, String url, File image) async {
+    try {
+      UploadFile uploadFile = UploadFile();
+      await uploadFile.call(url, image);
+
+      if (uploadFile.isUploaded != null && uploadFile.isUploaded) {
+        return true;
+      } else {
+        throw uploadFile.message;
+      }
+    } catch (e) {
+      throw e;
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
