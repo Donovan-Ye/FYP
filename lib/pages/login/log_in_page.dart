@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:fyp_yzj/config/graphqlClient.dart';
 import 'package:fyp_yzj/widget/text_divider.dart';
 import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogInPage extends StatefulWidget {
   static const String routeName = '/login';
@@ -24,6 +25,9 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController _unameController = new TextEditingController();
   TextEditingController _pwdController = new TextEditingController();
   GlobalKey _formKey = new GlobalKey<FormState>();
+
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,6 +148,8 @@ class _LogInPageState extends State<LogInPage> {
       print(_unameController.text);
       print(_pwdController.text);
       if (result.data["fetchObjectData"]["status"]) {
+        final SharedPreferences prefs = await _prefs;
+        prefs.setString("name", _unameController.text.trim());
         Get.toNamed(TabNavigator.routeName);
       } else {
         showDialog(

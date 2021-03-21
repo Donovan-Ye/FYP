@@ -12,9 +12,12 @@ class GenerateImageUrl {
   String uploadUrl;
   String downloadUrl;
 
-  Future<void> call(String fileType) async {
+  Future<void> call(String fileType, String username) async {
     try {
-      Map body = {"fileType": fileType};
+      Map body = {
+        "fileType": fileType,
+        "username": username,
+      };
 
       var response = await http.post(
         env['API_SERVER'] + "/generatePresignedUrl",

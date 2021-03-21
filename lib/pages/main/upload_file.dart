@@ -15,7 +15,7 @@ class UploadFile {
         isUploaded = true;
       }
     } catch (e) {
-      throw ('Error uploading photo');
+      throw ('Error uploading video');
     }
   }
 }

@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:fyp_yzj/pages/main/upload_file.dart';
 import 'package:easy_dialog/easy_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -28,6 +29,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   final ImagePicker _picker = ImagePicker();
   PickedFile _imageFile;
 
@@ -47,20 +50,16 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     getCurrentLocation();
 
     rootBundle.loadString('assets/map/map_style.txt').then((string) {
       _mapStyle = string;
     });
-
     BitmapDescriptor customIcon;
-
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
             'assets/images/icon/icon_white.png')
         .then((d) {
       customIcon = d;
-
       _markers.add(Marker(
         markerId: MarkerId(_center.toString()),
         position: _center,
@@ -138,7 +137,7 @@ class _MainPageState extends State<MainPage> {
             color: Colors.blue,
             icon: Icons.brightness_high,
             context: context,
-            tap: () {},
+            tap: () async {},
           ),
           MapFeatureIcon(
             name: "Video",
@@ -151,58 +150,60 @@ class _MainPageState extends State<MainPage> {
                   maxDuration: Duration(seconds: 300));
               if (file != null) {
                 EasyLoading.show(status: 'Uploading...');
+                final SharedPreferences prefs = await _prefs;
+                print(prefs.getString('name'));
+
+                GenerateImageUrl generateImageUrl = GenerateImageUrl();
+                await generateImageUrl.call(".mp4", prefs.getString('name'));
+
+                String uploadUrl;
+                String downloadUrl;
+                if (generateImageUrl.isGenerated != null &&
+                    generateImageUrl.isGenerated) {
+                  uploadUrl = generateImageUrl.uploadUrl;
+                  downloadUrl = generateImageUrl.downloadUrl;
+                  print(uploadUrl);
+                  print(downloadUrl);
+                } else {
+                  throw generateImageUrl.message;
+                }
+
+                bool isUploaded =
+                    await _uploadFile(context, uploadUrl, File(file.path));
+
+                EasyLoading.dismiss();
+                if (isUploaded) {
+                  EasyDialog(
+                    title: Text(
+                      "Success",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      textScaleFactor: 1.2,
+                    ),
+                    description: Text(
+                      "Upload successfully.",
+                      textScaleFactor: 1.1,
+                      textAlign: TextAlign.center,
+                    ),
+                  ).show(context);
+                } else {
+                  EasyDialog(
+                    title: Text(
+                      "Error",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      textScaleFactor: 1.2,
+                    ),
+                    description: Text(
+                      "Uploading failed. Please check your internet.",
+                      textScaleFactor: 1.1,
+                      textAlign: TextAlign.center,
+                    ),
+                  ).show(context);
+                }
+
+                setState(() {
+                  _imageFile = file;
+                });
               }
-
-              GenerateImageUrl generateImageUrl = GenerateImageUrl();
-              await generateImageUrl.call(".mp4");
-
-              String uploadUrl;
-              String downloadUrl;
-              if (generateImageUrl.isGenerated != null &&
-                  generateImageUrl.isGenerated) {
-                uploadUrl = generateImageUrl.uploadUrl;
-                downloadUrl = generateImageUrl.downloadUrl;
-                print(uploadUrl);
-                print(downloadUrl);
-              } else {
-                throw generateImageUrl.message;
-              }
-
-              bool isUploaded =
-                  await _uploadFile(context, uploadUrl, File(file.path));
-
-              EasyLoading.dismiss();
-              if (isUploaded) {
-                EasyDialog(
-                  title: Text(
-                    "Success",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textScaleFactor: 1.2,
-                  ),
-                  description: Text(
-                    "Upload successfully.",
-                    textScaleFactor: 1.1,
-                    textAlign: TextAlign.center,
-                  ),
-                ).show(context);
-              } else {
-                EasyDialog(
-                  title: Text(
-                    "Error",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textScaleFactor: 1.2,
-                  ),
-                  description: Text(
-                    "Uploading failed. Please check your internet.",
-                    textScaleFactor: 1.1,
-                    textAlign: TextAlign.center,
-                  ),
-                ).show(context);
-              }
-
-              setState(() {
-                _imageFile = file;
-              });
             },
           ),
         ],
