@@ -6,6 +6,7 @@ import 'package:fyp_yzj/navigator/tab_navigator.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_connecting_page.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
 import 'package:fyp_yzj/pages/emailVerificationCode/verification_code_page.dart';
+import 'package:fyp_yzj/pages/video/video_list_page.dart';
 import 'dart:developer' as developer;
 
 class FypRouter {
@@ -26,6 +27,8 @@ class FypRouter {
         return FakeCallPage.route();
       case VerificationCodePage.routeName:
         return VerificationCodePage.route();
+      case VideoListPage.routeName:
+        return VideoListPage.route();
       default:
         return _errorRoute();
     }

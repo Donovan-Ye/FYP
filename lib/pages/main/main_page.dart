@@ -22,6 +22,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:fyp_yzj/pages/main/upload_file.dart';
 import 'package:easy_dialog/easy_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fyp_yzj/pages/video/video_list_page.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -133,11 +134,13 @@ class _MainPageState extends State<MainPage> {
             },
           ),
           MapFeatureIcon(
-            name: "demo",
+            name: "List",
             color: Colors.blue,
-            icon: Icons.brightness_high,
+            icon: Icons.list,
             context: context,
-            tap: () async {},
+            tap: () async {
+              Get.toNamed(VideoListPage.routeName);
+            },
           ),
           MapFeatureIcon(
             name: "Video",

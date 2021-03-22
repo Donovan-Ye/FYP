@@ -50,7 +50,6 @@ dependencies:
   liquid_progress_indicator: ^0.3.2
 
   image_picker: ^0.6.7+22
-  video_player: ^1.0.1
   aws_s3: ^0.1.1+hotfix.5
   easy_dialog: ^1.0.5
   flutter_easyloading: ^3.0.0
@@ -58,6 +57,12 @@ dependencies:
   audioplayer: ^0.8.1
 
   shared_preferences: ^2.0.5
+
+  grouped_list: ^3.7.1
+  skeleton_loader: ^1.0.2+3
+  video_player: ^2.0.2
+
+  modal_bottom_sheet: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
