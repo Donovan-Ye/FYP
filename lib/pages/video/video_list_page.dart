@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -60,16 +63,16 @@ class _VideoListPageState extends State<VideoListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xff102439),
-      body: _buildBody(),
+    return Container(
+      color: Color(0xff102439),
+      child: _buildBody(),
     );
   }
 
   @override
   void dispose() {
+    _controller?.dispose();
     super.dispose();
-    _controller.dispose();
   }
 
   Widget _buildBody() {
@@ -104,7 +107,7 @@ class _VideoListPageState extends State<VideoListPage> {
             ],
           ),
         ),
-        items: 8,
+        items: 7,
         period: Duration(seconds: 2),
         highlightColor: Colors.lightBlue[300],
         direction: SkeletonDirection.ltr,
@@ -113,9 +116,34 @@ class _VideoListPageState extends State<VideoListPage> {
       return GroupedListView<dynamic, String>(
         elements: _elements,
         groupBy: (element) => element['date'].substring(0, 15),
-        groupComparator: (value1, value2) => value2.compareTo(value1),
-        // itemComparator: (item1, item2) =>
-        //     item1['name'].compareTo(item2['name']),
+        groupComparator: (value1, value2) {
+          DateTime d1 = HttpDate.parse(value1.substring(0, 3) +
+              ", " +
+              value1.substring(8, 10) +
+              value1.substring(3, 7) +
+              value2.substring(10, 14) +
+              " 00:00:00 GMT");
+          DateTime d2 = HttpDate.parse(value2.substring(0, 3) +
+              ", " +
+              value2.substring(8, 10) +
+              value2.substring(3, 7) +
+              value2.substring(10, 14) +
+              " 00:00:00 GMT");
+          return d1.compareTo(d2);
+        },
+        itemComparator: (item1, item2) {
+          DateTime d1 = HttpDate.parse(item1['date'].substring(0, 3) +
+              ", " +
+              item1['date'].substring(8, 10) +
+              item1['date'].substring(3, 7) +
+              item1['date'].substring(10, 28));
+          DateTime d2 = HttpDate.parse(item2['date'].substring(0, 3) +
+              ", " +
+              item2['date'].substring(8, 10) +
+              item2['date'].substring(3, 7) +
+              item2['date'].substring(10, 28));
+          return d1.compareTo(d2);
+        },
         order: GroupedListOrder.DESC,
         useStickyGroupSeparators: false,
         groupSeparatorBuilder: (String value) => Padding(
@@ -142,6 +170,8 @@ class _VideoListPageState extends State<VideoListPage> {
                 title: Text(element['date']),
                 trailing: Icon(Icons.arrow_forward),
                 onTap: () {
+                  EasyLoading.show(status: 'Connecting...');
+
                   _controller = VideoPlayerController.network(element['url'])
                     ..initialize().then((_) {
                       // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
@@ -153,6 +183,7 @@ class _VideoListPageState extends State<VideoListPage> {
                           builder: (context) => _getVideoWidget(),
                         );
                       });
+                      EasyLoading.dismiss();
                     });
                 },
               ),
@@ -183,27 +214,40 @@ class _VideoListPageState extends State<VideoListPage> {
         ),
         body: Container(
           child: Scaffold(
-            body: Center(
-              child: _controller.value.isInitialized
-                  ? AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: VideoPlayer(_controller),
-                    )
-                  : Container(),
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  _controller.value.isPlaying
-                      ? _controller.pause()
-                      : _controller.play();
-                });
-              },
-              child: Icon(
-                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              body: Center(
+                child: _controller.value.isInitialized
+                    ? AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      )
+                    : Container(),
               ),
-            ),
-          ),
+              floatingActionButton: StatefulBuilder(
+                builder: (BuildContext context,
+                    void Function(void Function()) setState) {
+                  return FloatingActionButton(
+                    backgroundColor: Colors.white,
+                    onPressed: () {
+                      print(_controller.value.isPlaying);
+                      _controller.setLooping(true);
+                      setState(() {
+                        _controller.value.isPlaying
+                            ? _controller.pause()
+                            : _controller.play();
+                      });
+                    },
+                    child: _controller.value.isPlaying
+                        ? Icon(
+                            Icons.pause,
+                            color: Colors.black,
+                          )
+                        : Icon(
+                            Icons.play_arrow,
+                            color: Colors.black,
+                          ),
+                  );
+                },
+              )),
         ),
       ),
     );
