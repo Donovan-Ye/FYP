@@ -34,21 +34,9 @@ class _LogInPageState extends State<LogInPage> {
       appBar: _getAppBar(),
       backgroundColor: Colors.black,
       body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 24.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: _getLogInMainWidget(),
-              ),
-              Text(
-                "Trouble logging in?",
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xff008AF3),
-                ),
-              ),
-            ],
+          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 24.0),
+          child: Expanded(
+            child: _getLogInMainWidget(),
           )),
     );
   }
@@ -59,7 +47,6 @@ class _LogInPageState extends State<LogInPage> {
       autovalidate: true,
       child: Column(
         children: <Widget>[
-          const SizedBox(height: 20),
           TextFormFieldWidget(
             controller: _unameController,
             labelText: "Username",
@@ -75,20 +62,21 @@ class _LogInPageState extends State<LogInPage> {
             labelText: "Password",
             hintText: "password",
             icon: Icon(Icons.lock, color: Colors.white),
+            isPass: true,
             vali: (v) {
               return v.trim().length > 5
                   ? null
                   : "password should not less then 5";
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           Row(
             children: <Widget>[
               Expanded(
                 child: RaisedButton(
-                    child: Text('Log In', style: TextStyle(fontSize: 18)),
+                    child: Text('Log In', style: TextStyle(fontSize: 15)),
                     color: Color(0xff008AF3),
-                    padding: EdgeInsets.fromLTRB(140, 14, 140, 14),
+                    padding: EdgeInsets.fromLTRB(130, 14, 130, 14),
                     textColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6)),
@@ -98,12 +86,12 @@ class _LogInPageState extends State<LogInPage> {
           ),
           const SizedBox(height: 10),
           TextDivider(content: "OR"),
-          const SizedBox(height: 15),
+          const SizedBox(height: 10),
           Container(
             child: GestureDetector(
               child: Text(
                 "Don't have account? Sign up",
-                style: TextStyle(color: Color(0xff008AF3), fontSize: 15),
+                style: TextStyle(color: Color(0xff008AF3), fontSize: 12),
                 textAlign: TextAlign.center,
               ),
               onTap: () {
@@ -118,7 +106,10 @@ class _LogInPageState extends State<LogInPage> {
 
   Widget _getAppBar() {
     return new AppBar(
-      title: new Text('Log In'),
+      title: new Text(
+        'Log In',
+        style: TextStyle(fontSize: 18),
+      ),
       leading: new IconButton(
           icon: new Icon(Icons.arrow_back),
           onPressed: () {

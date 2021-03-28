@@ -11,14 +11,14 @@ class LogInReminder extends StatelessWidget {
       children: [
         Text(
           "Already has account? ",
-          style: TextStyle(color: Colors.grey, fontSize: 14),
+          style: TextStyle(color: Colors.grey, fontSize: 10),
           textAlign: TextAlign.center,
         ),
         Container(
           child: GestureDetector(
             child: Text(
               "Log In",
-              style: TextStyle(color: Color(0xff008AF3), fontSize: 15),
+              style: TextStyle(color: Color(0xff008AF3), fontSize: 11),
               textAlign: TextAlign.center,
             ),
             onTap: () {

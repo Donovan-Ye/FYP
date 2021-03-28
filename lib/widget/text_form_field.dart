@@ -6,6 +6,7 @@ class TextFormFieldWidget extends StatelessWidget {
   final String hintText;
   final Icon icon;
   final Function vali;
+  final bool isPass;
 
   const TextFormFieldWidget(
       {Key key,
@@ -13,37 +14,41 @@ class TextFormFieldWidget extends StatelessWidget {
       this.labelText,
       this.hintText,
       this.icon,
-      this.vali})
+      this.vali,
+      this.isPass = false})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      style: TextStyle(
-        color: Colors.white,
+    return Container(
+      child: TextFormField(
+        style: TextStyle(
+          color: Colors.white,
+        ),
+        autofocus: isPass,
+        controller: controller,
+        obscureText: true,
+        decoration: InputDecoration(
+            border: new OutlineInputBorder(
+              gapPadding: 1.0,
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: BorderSide(
+                color: Color(0xff008AF3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Color(0xff008AF3),
+              ),
+            ),
+            filled: true,
+            fillColor: Color(0xff2d2d2d),
+            labelText: labelText,
+            labelStyle: TextStyle(fontSize: 12, color: Colors.white),
+            hintText: hintText,
+            icon: icon),
+        validator: vali,
       ),
-      autofocus: false,
-      controller: controller,
-      decoration: InputDecoration(
-          border: new OutlineInputBorder(
-            gapPadding: 10.0,
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(
-              color: Color(0xff008AF3),
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xff008AF3),
-            ),
-          ),
-          filled: true,
-          fillColor: Color(0xff2d2d2d),
-          labelText: labelText,
-          labelStyle: TextStyle(fontSize: 15, color: Colors.white),
-          hintText: hintText,
-          icon: icon),
-      validator: vali,
     );
   }
 }

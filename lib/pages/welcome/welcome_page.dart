@@ -25,7 +25,7 @@ class _WelcomePageState extends State<WelcomePage> {
         body: Column(
           children: <Widget>[
             Container(
-              margin: const EdgeInsets.only(top: 230.0),
+              margin: const EdgeInsets.only(top: 120.0),
               child: Center(
                 child: Text(
                   "Welcome to",
@@ -33,11 +33,12 @@ class _WelcomePageState extends State<WelcomePage> {
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontSize: 40),
+                      fontSize: 30),
                 ),
               ),
             ),
             Container(
+              height: 80,
               child: Center(
                   child: Image(
                 image: AssetImage("assets/images/icon/icon_white.png"),
@@ -48,9 +49,9 @@ class _WelcomePageState extends State<WelcomePage> {
               onPressed: () {
                 Get.toNamed(LogInPage.routeName);
               },
-              child: Text('Log In', style: TextStyle(fontSize: 18)),
+              child: Text('Log In', style: TextStyle(fontSize: 15)),
               color: Color(0xff008AF3),
-              padding: EdgeInsets.fromLTRB(160, 15, 160, 15),
+              padding: EdgeInsets.fromLTRB(150, 15, 150, 15),
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
@@ -62,7 +63,7 @@ class _WelcomePageState extends State<WelcomePage> {
               child: GestureDetector(
                 child: Text(
                   "Sign up with email",
-                  style: TextStyle(color: Color(0xff304F9D), fontSize: 15),
+                  style: TextStyle(color: Color(0xff304F9D), fontSize: 12),
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {

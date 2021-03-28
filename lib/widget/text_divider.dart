@@ -20,7 +20,7 @@ class TextDivider extends StatelessWidget {
         ),
         Text(
           content,
-          style: TextStyle(color: Color(0xff898989)),
+          style: TextStyle(color: Color(0xff898989), fontSize: 10),
           textAlign: TextAlign.center,
         )
       ],

@@ -29,7 +29,10 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: new AppBar(
-        title: new Text('Sign Up'),
+        title: new Text(
+          'Sign Up',
+          style: TextStyle(fontSize: 18),
+        ),
         leading: new IconButton(
             icon: new Icon(Icons.arrow_back),
             onPressed: () {
@@ -58,7 +61,6 @@ class _SignUpPageState extends State<SignUpPage> {
       autovalidate: true, //开启自动校验
       child: Column(
         children: <Widget>[
-          const SizedBox(height: 20),
           TextFormFieldWidget(
             controller: _emailController,
             labelText: "Email",
@@ -98,7 +100,10 @@ class _SignUpPageState extends State<SignUpPage> {
               Expanded(
                 child: RaisedButton(
                   padding: EdgeInsets.all(15.0),
-                  child: Text("Sign Up"),
+                  child: Text(
+                    "Sign Up",
+                    style: TextStyle(fontSize: 15),
+                  ),
                   color: Color(0xff008AF3),
                   textColor: Colors.white,
                   onPressed: _signUp,
