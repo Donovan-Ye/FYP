@@ -47,8 +47,8 @@ class _MainPageState extends State<MainPage> {
 
   Set<Marker> _markers = {};
 
-  LatLng _center = const LatLng(52.261268, -7.150473);
-
+  LatLng center;
+  BitmapDescriptor customIcon;
   @override
   void initState() {
     // TODO: implement initState
@@ -57,20 +57,6 @@ class _MainPageState extends State<MainPage> {
 
     rootBundle.loadString('assets/map/map_style.txt').then((string) {
       _mapStyle = string;
-    });
-    BitmapDescriptor customIcon;
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(12, 12)),
-            'assets/images/icon/icon_white.png')
-        .then((d) {
-      customIcon = d;
-      _markers.add(Marker(
-        markerId: MarkerId(_center.toString()),
-        position: _center,
-        infoWindow: InfoWindow(
-          title: 'I am here',
-        ),
-        icon: customIcon,
-      ));
     });
 
     _initPicovoice();
@@ -91,14 +77,21 @@ class _MainPageState extends State<MainPage> {
           Column(
             children: <Widget>[
               Expanded(
-                child: GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 11.0,
-                  ),
-                  markers: _markers,
-                ),
+                child: center == null
+                    ? Container(
+                        color: Color(0xff102439),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: center,
+                          zoom: 17.0,
+                        ),
+                        markers: _markers,
+                      ),
               ),
               Container(
                 height: 60,
@@ -213,8 +206,25 @@ class _MainPageState extends State<MainPage> {
 
   void getCurrentLocation() async {
     Position res = await Geolocator.getCurrentPosition();
+    print(res);
+
+    await BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(size: Size(12, 12)),
+            'assets/images/icon/icon_white.png')
+        .then((d) {
+      customIcon = d;
+      _markers.add(Marker(
+        markerId: MarkerId(LatLng(res.latitude, res.longitude).toString()),
+        position: LatLng(res.latitude, res.longitude),
+        infoWindow: InfoWindow(
+          title: 'I am here',
+        ),
+        icon: customIcon,
+      ));
+    });
+
     setState(() {
-      _center = LatLng(res.latitude, res.longitude);
+      center = LatLng(res.latitude, res.longitude);
     });
   }
 
