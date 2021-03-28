@@ -5,24 +5,26 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
-import 'package:fyp_yzj/pages/main/generate_image_url.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fyp_yzj/pages/main/picker_data.dart';
 import 'package:fyp_yzj/pages/countdown/countdown_page.dart';
 import 'package:get/get.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:fyp_yzj/pages/main/widget/map_feature_icon.dart';
 import 'package:fyp_yzj/pages/main/widget/floating_icons.dart';
-import 'package:fyp_yzj/pages/video/video_page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:fyp_yzj/pages/main/upload_file.dart';
 import 'package:easy_dialog/easy_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fyp_yzj/pages/video/video_list_page.dart';
+import 'package:fyp_yzj/util/uploadFile.dart';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:picovoice/picovoice_manager.dart';
+import 'package:picovoice/picovoice_error.dart';
+import 'package:camera/camera.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -30,7 +32,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  PicovoiceManager _picovoiceManager;
 
   final ImagePicker _picker = ImagePicker();
   PickedFile _imageFile;
@@ -70,6 +72,14 @@ class _MainPageState extends State<MainPage> {
         icon: customIcon,
       ));
     });
+
+    _initPicovoice();
+  }
+
+  @override
+  void dispose() {
+    _picovoiceManager?.delete();
+    super.dispose();
   }
 
   @override
@@ -153,26 +163,8 @@ class _MainPageState extends State<MainPage> {
                   maxDuration: Duration(seconds: 300));
               if (file != null) {
                 EasyLoading.show(status: 'Uploading...');
-                final SharedPreferences prefs = await _prefs;
-                print(prefs.getString('name'));
 
-                GenerateImageUrl generateImageUrl = GenerateImageUrl();
-                await generateImageUrl.call(".mp4", prefs.getString('name'));
-
-                String uploadUrl;
-                String downloadUrl;
-                if (generateImageUrl.isGenerated != null &&
-                    generateImageUrl.isGenerated) {
-                  uploadUrl = generateImageUrl.uploadUrl;
-                  downloadUrl = generateImageUrl.downloadUrl;
-                  print(uploadUrl);
-                  print(downloadUrl);
-                } else {
-                  throw generateImageUrl.message;
-                }
-
-                bool isUploaded =
-                    await _uploadFile(context, uploadUrl, File(file.path));
+                bool isUploaded = await uploadFile(".mp4", file.path, context);
 
                 EasyLoading.dismiss();
                 if (isUploaded) {
@@ -214,21 +206,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Future<bool> _uploadFile(context, String url, File image) async {
-    try {
-      UploadFile uploadFile = UploadFile();
-      await uploadFile.call(url, image);
-
-      if (uploadFile.isUploaded != null && uploadFile.isUploaded) {
-        return true;
-      } else {
-        throw uploadFile.message;
-      }
-    } catch (e) {
-      throw e;
-    }
-  }
-
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     mapController.setMapStyle(_mapStyle);
@@ -241,10 +218,16 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  void _alarm() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return AlarmPage();
-    }));
+  void _alarm() async {
+    List<CameraDescription> cameras = await availableCameras();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AlarmPage(
+          cameras: cameras,
+        ),
+      ),
+    );
   }
 
   void _fakeCall() {
@@ -287,5 +270,46 @@ class _MainPageState extends State<MainPage> {
             int.parse(picker.getSelectedValues()[2]),
           );
         }).showDialog(context);
+  }
+
+  void _initPicovoice() async {
+    String keywordAsset = "assets/audio/patronus_android.ppn";
+    String keywordPath = await _extractAsset(keywordAsset);
+    String contextAsset = "assets/audio/fyp_en.rhn";
+    String contextPath = await _extractAsset(contextAsset);
+
+    try {
+      _picovoiceManager = await PicovoiceManager.create(
+          keywordPath, _wakeWordCallback, contextPath, _inferenceCallback);
+      _picovoiceManager.start();
+    } on PvError catch (ex) {
+      print(ex);
+    }
+  }
+
+  void _wakeWordCallback(int keywordIndex) {
+    print("wake word detected!");
+  }
+
+  void _inferenceCallback(Map<String, dynamic> inference) {
+    print(inference);
+    print(inference["isUnderstood"]);
+    if (inference["isUnderstood"] && inference["intent"] == "searchHelp") {
+      _alarm();
+    }
+  }
+
+  Future<String> _extractAsset(String resourcePath) async {
+    String resourceDirectory = (await getApplicationDocumentsDirectory()).path;
+    String outputPath = '$resourceDirectory/$resourcePath';
+    File outputFile = new File(outputPath);
+
+    ByteData data = await rootBundle.load(resourcePath);
+    final buffer = data.buffer;
+
+    await outputFile.create(recursive: true);
+    await outputFile.writeAsBytes(
+        buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
+    return outputPath;
   }
 }

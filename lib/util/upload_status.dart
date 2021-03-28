@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-class UploadFile {
+class UploadStatus {
   bool success;
   String message;
 

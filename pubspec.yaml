@@ -56,13 +56,16 @@ dependencies:
 
   audioplayer: ^0.8.1
 
-  shared_preferences: ^2.0.5
+  shared_preferences: ^0.5.12+4
 
   grouped_list: ^3.7.1
   skeleton_loader: ^1.0.2+3
   video_player: ^2.0.2
 
   modal_bottom_sheet: ^2.0.0
+
+  picovoice: ^1.1.0
+  camera: ^0.7.0+2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -86,6 +89,9 @@ flutter:
   assets:
     - assets/images/
     - assets/audio/call_sound.mp3
+    - assets/audio/alarm.mp3
+    - assets/audio/fyp_en.rhn
+    - assets/audio/patronus_android.ppn
     - assets/images/fakeCall/
     - assets/images/icon/
     - assets/map/map_style.txt
