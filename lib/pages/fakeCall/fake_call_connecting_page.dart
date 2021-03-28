@@ -29,8 +29,8 @@ class _FakeCallPage extends State<FakeCallConnectingPage> {
         child: Stack(
           children: <Widget>[
             Positioned(
-              bottom: 95.0,
-              left: 155,
+              bottom: 80.0,
+              left: 135,
               child: _handUp(
                 Colors.red,
                 Icons.call_end,

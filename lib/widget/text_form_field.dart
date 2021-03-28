@@ -25,9 +25,9 @@ class TextFormFieldWidget extends StatelessWidget {
         style: TextStyle(
           color: Colors.white,
         ),
-        autofocus: isPass,
+        autofocus: false,
         controller: controller,
-        obscureText: true,
+        obscureText: isPass,
         decoration: InputDecoration(
             border: new OutlineInputBorder(
               gapPadding: 1.0,

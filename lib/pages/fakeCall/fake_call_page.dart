@@ -44,7 +44,7 @@ class _FakeCallPage extends State<FakeCallPage> {
         child: Stack(
           children: <Widget>[
             Positioned(
-              bottom: 95.0,
+              bottom: 80.0,
               left: 49,
               child: _fakeCallButton(
                 Colors.red,
@@ -53,7 +53,7 @@ class _FakeCallPage extends State<FakeCallPage> {
               ),
             ),
             Positioned(
-              bottom: 95.0,
+              bottom: 80.0,
               right: 41,
               child: _fakeCallButton(
                 Colors.green,
