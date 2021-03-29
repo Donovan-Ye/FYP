@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:picovoice/picovoice_manager.dart';
 import 'package:picovoice/picovoice_error.dart';
 import 'package:camera/camera.dart';
+import 'package:telephony/telephony.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -32,6 +34,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final Telephony telephony = Telephony.instance;
+
   PicovoiceManager _picovoiceManager;
 
   final ImagePicker _picker = ImagePicker();
@@ -47,8 +51,12 @@ class _MainPageState extends State<MainPage> {
 
   Set<Marker> _markers = {};
 
-  LatLng center;
+  LatLng mapCenter;
   BitmapDescriptor customIcon;
+
+  Timer _timer;
+  int _start = 10;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -64,6 +72,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
+    _timer.cancel();
     _picovoiceManager?.delete();
     super.dispose();
   }
@@ -77,7 +86,7 @@ class _MainPageState extends State<MainPage> {
           Column(
             children: <Widget>[
               Expanded(
-                child: center == null
+                child: mapCenter == null
                     ? Container(
                         color: Color(0xff102439),
                         child: Center(
@@ -87,7 +96,7 @@ class _MainPageState extends State<MainPage> {
                     : GoogleMap(
                         onMapCreated: _onMapCreated,
                         initialCameraPosition: CameraPosition(
-                          target: center,
+                          target: mapCenter,
                           zoom: 17.0,
                         ),
                         markers: _markers,
@@ -101,7 +110,10 @@ class _MainPageState extends State<MainPage> {
           ),
           Container(
             padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
-            child: FloatingIcons(),
+            child: FloatingIcons(
+              icon1Tap: () async {},
+              icon2Tap: () {},
+            ),
           )
         ],
       ),
@@ -199,6 +211,26 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  final SmsSendStatusListener listener = (SendStatus status) {
+    print(status);
+  };
+
+  void _setSMS(String phone) {
+    telephony.sendSms(
+        to: phone,
+        message:
+            "HELP! I am in DANGER! Here is my position: http://maps.google.com/maps?q=" +
+                mapCenter.latitude.toString() +
+                "," +
+                mapCenter.longitude.toString() +
+                "&ll=" +
+                mapCenter.latitude.toString() +
+                "," +
+                mapCenter.longitude.toString() +
+                "&z=17. FROM Patronus.",
+        statusListener: listener);
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     mapController.setMapStyle(_mapStyle);
@@ -224,7 +256,7 @@ class _MainPageState extends State<MainPage> {
     });
 
     setState(() {
-      center = LatLng(res.latitude, res.longitude);
+      mapCenter = LatLng(res.latitude, res.longitude);
     });
   }
 
@@ -305,7 +337,72 @@ class _MainPageState extends State<MainPage> {
     print(inference);
     print(inference["isUnderstood"]);
     if (inference["isUnderstood"] && inference["intent"] == "searchHelp") {
-      _alarm();
+      EasyDialog(
+          closeButton: false,
+          cornerRadius: 10.0,
+          fogOpacity: 0.1,
+          width: 280,
+          height: 188,
+          title: Text(
+            "Countdown to Alarm",
+            style: TextStyle(fontWeight: FontWeight.bold),
+            textScaleFactor: 1.2,
+          ),
+          descriptionPadding:
+              EdgeInsets.only(left: 17.5, right: 17.5, bottom: 15.0),
+          description: Text(
+              "After the countdown is over, the current location will be sent to the preset contacts, and the video will be recorded and an alarm will be issued at the same time."),
+          contentPadding:
+              EdgeInsets.only(top: 12.0), // Needed for the button design
+          contentList: [
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0))),
+              child: TextButton(
+                onPressed: () {
+                  _timer.cancel();
+                  _start = 10;
+                  Navigator.of(context).pop();
+                },
+                child: StatefulBuilder(
+                  builder: (BuildContext context,
+                      void Function(void Function()) setState) {
+                    void startTimer() {
+                      const oneSec = const Duration(seconds: 1);
+                      _timer = new Timer.periodic(
+                        oneSec,
+                        (Timer timer) {
+                          if (_start != 0) {
+                            setState(() {
+                              _start--;
+                            });
+                          } else {
+                            timer.cancel();
+                            _timer.cancel();
+                            _start = 10;
+                            Navigator.of(context).pop();
+                            _setSMS("+353894168881");
+                            _alarm();
+                          }
+                          timer.cancel();
+                        },
+                      );
+                    }
+
+                    startTimer();
+                    return Text(
+                      "Cancel($_start)",
+                      style: TextStyle(color: Colors.white),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ]).show(context);
     }
   }
 

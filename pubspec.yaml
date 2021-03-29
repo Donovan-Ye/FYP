@@ -66,6 +66,8 @@ dependencies:
 
   picovoice: ^1.1.0
   camera: ^0.7.0+2
+
+  telephony: ^0.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

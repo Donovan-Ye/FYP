@@ -22,7 +22,7 @@ class CountdownPage extends StatelessWidget {
     return MaterialApp(
       home: BlocProvider(
         create: (context) => TimerBloc(secondSum, ticker: Ticker()),
-        child: Timer(
+        child: _Timer(
           duration: secondSum,
         ),
       ),
@@ -30,13 +30,13 @@ class CountdownPage extends StatelessWidget {
   }
 }
 
-class Timer extends StatelessWidget {
+class _Timer extends StatelessWidget {
   final int duration;
 
   static const TextStyle timerTextStyle =
       TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white);
 
-  const Timer({Key key, this.duration}) : super(key: key);
+  const _Timer({Key key, this.duration}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,7 @@ class Timer extends StatelessWidget {
                           .padLeft(2, '0');
                       return Text(
                         '$hoursStr:$minutesStr:$secondsStr',
-                        style: Timer.timerTextStyle,
+                        style: _Timer.timerTextStyle,
                       );
                     },
                   ),
