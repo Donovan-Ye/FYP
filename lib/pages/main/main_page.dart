@@ -62,6 +62,8 @@ class _MainPageState extends State<MainPage> {
   Timer _timer;
   int _start = 10;
 
+  bool _isPicoVoiceRunning = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -124,7 +126,22 @@ class _MainPageState extends State<MainPage> {
                   builder: (context) => FriendListWidget(),
                 );
               },
-              icon2Tap: () {},
+              icon4Tap: () {
+                if (_isPicoVoiceRunning) {
+                  EasyLoading.showInfo('Stop voice listening.');
+                  _picovoiceManager.stop();
+                } else {
+                  EasyLoading.showSuccess('Start voice listening.');
+                  _picovoiceManager.start();
+                }
+                setState(() {
+                  _isPicoVoiceRunning = !_isPicoVoiceRunning;
+                });
+              },
+              icon4: _isPicoVoiceRunning
+                  ? Icon(Icons.mic_off_outlined)
+                  : Icon(Icons.keyboard_voice),
+              icon4Color: _isPicoVoiceRunning ? Colors.red : Colors.white,
             ),
           )
         ],

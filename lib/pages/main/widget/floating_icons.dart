@@ -6,10 +6,18 @@ class FloatingIcons extends StatefulWidget {
   final Function icon2Tap;
   final Function icon3Tap;
   final Function icon4Tap;
+  final Icon icon4;
+  final Color icon4Color;
 
-  const FloatingIcons(
-      {Key key, this.icon1Tap, this.icon2Tap, this.icon3Tap, this.icon4Tap})
-      : super(key: key);
+  const FloatingIcons({
+    Key key,
+    this.icon1Tap,
+    this.icon2Tap,
+    this.icon3Tap,
+    this.icon4Tap,
+    this.icon4,
+    this.icon4Color,
+  }) : super(key: key);
 
   @override
   _FloatingIcons createState() => _FloatingIcons();
@@ -20,15 +28,15 @@ class _FloatingIcons extends State<FloatingIcons> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _floatingIcon(Icon(Icons.hail), tap: widget.icon1Tap),
-        _floatingIcon(Icon(Icons.radio), tap: widget.icon2Tap),
-        _floatingIcon(Icon(Icons.wifi)),
-        _floatingIcon(Icon(Icons.location_city)),
+        _floatingIcon(Icon(Icons.hail), Colors.white, tap: widget.icon1Tap),
+        _floatingIcon(Icon(Icons.radio), Colors.white, tap: widget.icon2Tap),
+        _floatingIcon(Icon(Icons.wifi), Colors.white, tap: widget.icon3Tap),
+        _floatingIcon(widget.icon4, widget.icon4Color, tap: widget.icon4Tap),
       ],
     );
   }
 
-  Widget _floatingIcon(Icon icon, {Function tap}) {
+  Widget _floatingIcon(Icon icon, Color color, {Function tap}) {
     return GestureDetector(
       onTap: tap,
       child: Container(
@@ -37,7 +45,7 @@ class _FloatingIcons extends State<FloatingIcons> {
         margin: EdgeInsets.only(top: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
-          color: Colors.white,
+          color: color,
         ),
         child: icon,
       ),
