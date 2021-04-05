@@ -42,10 +42,12 @@ class _VideoListPageState extends State<VideoListPage> {
     final result = await GraphqlClient.getNewClient().query(
       QueryOptions(
         documentNode: gql('''
-            query getVideosList(\$username:String!) {
-              getVideosList(username: \$username) {
-                url
-                date
+            query getUser(\$username:String!) {
+              getUser(username: \$username) {
+                videos{
+                  url
+                  date
+                }
               }
             }
           '''),
@@ -53,11 +55,9 @@ class _VideoListPageState extends State<VideoListPage> {
       ),
     );
     if (result.hasException) throw result.exception;
-    print("result.data");
-    print(result.data["getVideosList"]);
     await Future.delayed(Duration(seconds: 3));
     setState(() {
-      _elements = result.data["getVideosList"];
+      _elements = result.data["getUser"]["videos"];
     });
   }
 

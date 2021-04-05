@@ -6,6 +6,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
+import 'package:fyp_yzj/pages/main/widget/friend_list_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fyp_yzj/pages/main/picker_data.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:fyp_yzj/pages/main/widget/map_feature_icon.dart';
 import 'package:fyp_yzj/pages/main/widget/floating_icons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:easy_dialog/easy_dialog.dart';
@@ -26,6 +28,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:picovoice/picovoice_manager.dart';
 import 'package:picovoice/picovoice_error.dart';
 import 'package:camera/camera.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telephony/telephony.dart';
 
 class MainPage extends StatefulWidget {
@@ -34,6 +37,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   final Telephony telephony = Telephony.instance;
 
   PicovoiceManager _picovoiceManager;
@@ -111,7 +116,14 @@ class _MainPageState extends State<MainPage> {
           Container(
             padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
             child: FloatingIcons(
-              icon1Tap: () async {},
+              icon1Tap: () {
+                showBarModalBottomSheet(
+                  expand: true,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => FriendListWidget(),
+                );
+              },
               icon2Tap: () {},
             ),
           )
@@ -137,7 +149,9 @@ class _MainPageState extends State<MainPage> {
             color: Color(0xffcc0000),
             icon: Icons.notifications,
             context: context,
-            tap: _alarm,
+            tap: () {
+              _alarmDialog(context);
+            },
           ),
           MapFeatureIcon(
             name: "Fake",
@@ -314,6 +328,77 @@ class _MainPageState extends State<MainPage> {
         }).showDialog(context);
   }
 
+  void _alarmDialog(BuildContext context) async {
+    final SharedPreferences prefs = await _prefs;
+
+    EasyDialog(
+        closeButton: false,
+        cornerRadius: 10.0,
+        fogOpacity: 0.1,
+        width: 280,
+        height: 188,
+        title: Text(
+          "Countdown to Alarm",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        descriptionPadding:
+            EdgeInsets.only(left: 17.5, right: 17.5, bottom: 15.0),
+        description: Text(
+            "After the countdown is over, the current location will be sent to ${prefs.getString('currentEmergencyContact')}, and the video will be recorded and an alarm will be issued at the same time."),
+        contentPadding:
+            EdgeInsets.only(top: 12.0), // Needed for the button design
+        contentList: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10.0),
+                    bottomRight: Radius.circular(10.0))),
+            child: TextButton(
+              onPressed: () {
+                _timer.cancel();
+                _start = 10;
+                Navigator.of(context).pop();
+              },
+              child: StatefulBuilder(
+                builder: (BuildContext context,
+                    void Function(void Function()) setState) {
+                  void startTimer() {
+                    const oneSec = const Duration(seconds: 1);
+                    _timer = new Timer.periodic(
+                      oneSec,
+                      (Timer timer) {
+                        if (_start != 0) {
+                          setState(() {
+                            _start--;
+                          });
+                        } else {
+                          timer.cancel();
+                          _timer.cancel();
+                          _start = 10;
+                          Navigator.of(context).pop();
+                          _setSMS("+353894168881");
+                          _alarm();
+                        }
+                        timer.cancel();
+                      },
+                    );
+                  }
+
+                  startTimer();
+                  return Text(
+                    "Cancel($_start)",
+                    style: TextStyle(color: Colors.white),
+                  );
+                },
+              ),
+            ),
+          ),
+        ]).show(context);
+  }
+
   void _initPicovoice() async {
     String keywordAsset = "assets/audio/patronus_android.ppn";
     String keywordPath = await _extractAsset(keywordAsset);
@@ -337,72 +422,7 @@ class _MainPageState extends State<MainPage> {
     print(inference);
     print(inference["isUnderstood"]);
     if (inference["isUnderstood"] && inference["intent"] == "searchHelp") {
-      EasyDialog(
-          closeButton: false,
-          cornerRadius: 10.0,
-          fogOpacity: 0.1,
-          width: 280,
-          height: 188,
-          title: Text(
-            "Countdown to Alarm",
-            style: TextStyle(fontWeight: FontWeight.bold),
-            textScaleFactor: 1.2,
-          ),
-          descriptionPadding:
-              EdgeInsets.only(left: 17.5, right: 17.5, bottom: 15.0),
-          description: Text(
-              "After the countdown is over, the current location will be sent to the preset contacts, and the video will be recorded and an alarm will be issued at the same time."),
-          contentPadding:
-              EdgeInsets.only(top: 12.0), // Needed for the button design
-          contentList: [
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10.0),
-                      bottomRight: Radius.circular(10.0))),
-              child: TextButton(
-                onPressed: () {
-                  _timer.cancel();
-                  _start = 10;
-                  Navigator.of(context).pop();
-                },
-                child: StatefulBuilder(
-                  builder: (BuildContext context,
-                      void Function(void Function()) setState) {
-                    void startTimer() {
-                      const oneSec = const Duration(seconds: 1);
-                      _timer = new Timer.periodic(
-                        oneSec,
-                        (Timer timer) {
-                          if (_start != 0) {
-                            setState(() {
-                              _start--;
-                            });
-                          } else {
-                            timer.cancel();
-                            _timer.cancel();
-                            _start = 10;
-                            Navigator.of(context).pop();
-                            _setSMS("+353894168881");
-                            _alarm();
-                          }
-                          timer.cancel();
-                        },
-                      );
-                    }
-
-                    startTimer();
-                    return Text(
-                      "Cancel($_start)",
-                      style: TextStyle(color: Colors.white),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ]).show(context);
+      _alarmDialog(context);
     }
   }
 

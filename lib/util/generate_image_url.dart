@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -12,16 +13,20 @@ class GenerateImageUrl {
   String uploadUrl;
   String downloadUrl;
 
-  Future<void> call(String fileType, String username) async {
+  Future<void> call(String fileType, String username,
+      {String friendName, String friendPhone}) async {
     try {
-      Map body = {
-        "fileType": fileType,
-        "username": username,
-      };
-
       var response = await http.post(
         env['API_SERVER'] + "/generatePresignedUrl",
-        body: body,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "fileType": fileType,
+          "username": username,
+          "friendInfo": {
+            "name": friendName,
+            "phone": friendPhone,
+          }
+        }),
       );
 
       var result = jsonDecode(response.body);
@@ -39,6 +44,8 @@ class GenerateImageUrl {
         }
       }
     } catch (e) {
+      print(e.toString());
+      EasyLoading.dismiss();
       throw ('Error getting url');
     }
   }
