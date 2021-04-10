@@ -7,7 +7,7 @@ import 'package:fyp_yzj/util/generate_image_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<bool> uploadFile(String fileType, String filePath, BuildContext context,
-    {String friendName, String friendPhone}) async {
+    {String friendName, String friendPhone, bool isChangeProfile}) async {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final SharedPreferences prefs = await _prefs;
 
@@ -15,6 +15,7 @@ Future<bool> uploadFile(String fileType, String filePath, BuildContext context,
   await generateImageUrl.call(
     fileType,
     prefs.getString('name'),
+    isChangeProfile: isChangeProfile,
     friendName: friendName,
     friendPhone: friendPhone,
   );

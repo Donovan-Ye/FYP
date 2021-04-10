@@ -146,10 +146,11 @@ class _TabNavigatorState extends State<TabNavigator> {
         break;
       case 3:
         setState(() {
-          snakeBarStyle = SnakeBarBehaviour.pinned;
+          snakeBarStyle = SnakeBarBehaviour.floating;
           snakeShape = SnakeShape.circle;
           padding = const EdgeInsets.all(12);
-          bottomBarShape = null;
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
           showSelectedLabels = false;
           showUnselectedLabels = false;
         });
