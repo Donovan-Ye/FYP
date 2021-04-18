@@ -67,6 +67,7 @@ class _TabNavigatorState extends State<TabNavigator> {
           children: <Widget>[
             MainPage(),
             SearchHelpPage(),
+            SearchHelpPage(),
             SearchPage(
               hideLeft: true,
             ),
@@ -97,9 +98,11 @@ class _TabNavigatorState extends State<TabNavigator> {
         items: [
           const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
           const BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'calendar'),
+              icon: Icon(Icons.policy), label: 'search_help'),
           const BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'home'),
+              icon: Icon(Icons.verified_user), label: 'applied_help'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.add_moderator), label: 'provide_help'),
           const BottomNavigationBarItem(
               icon: Icon(Icons.perm_identity), label: 'my'),
         ],
@@ -125,10 +128,11 @@ class _TabNavigatorState extends State<TabNavigator> {
         break;
       case 1:
         setState(() {
-          snakeBarStyle = SnakeBarBehaviour.pinned;
+          snakeBarStyle = SnakeBarBehaviour.floating;
           snakeShape = SnakeShape.circle;
           padding = const EdgeInsets.all(12);
-          bottomBarShape = RoundedRectangleBorder(borderRadius: _borderRadius);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
           showSelectedLabels = false;
           showUnselectedLabels = false;
         });
@@ -136,15 +140,27 @@ class _TabNavigatorState extends State<TabNavigator> {
 
       case 2:
         setState(() {
-          snakeBarStyle = SnakeBarBehaviour.pinned;
+          snakeBarStyle = SnakeBarBehaviour.floating;
           snakeShape = SnakeShape.circle;
           padding = const EdgeInsets.all(12);
-          bottomBarShape = BeveledRectangleBorder(borderRadius: _borderRadius);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
           showSelectedLabels = false;
           showUnselectedLabels = false;
         });
         break;
       case 3:
+        setState(() {
+          snakeBarStyle = SnakeBarBehaviour.floating;
+          snakeShape = SnakeShape.circle;
+          padding = const EdgeInsets.all(12);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
+          showSelectedLabels = false;
+          showUnselectedLabels = false;
+        });
+        break;
+      case 4:
         setState(() {
           snakeBarStyle = SnakeBarBehaviour.floating;
           snakeShape = SnakeShape.circle;
