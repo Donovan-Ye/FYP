@@ -1,4 +1,5 @@
-import 'package:fyp_yzj/pages/home/search_help_page.dart';
+import 'package:fyp_yzj/pages/appliedService/appliedServicePage.dart';
+import 'package:fyp_yzj/pages/searchService/search_service_page.dart';
 import 'package:fyp_yzj/pages/my/my_page.dart';
 import 'package:fyp_yzj/pages/search/search_page.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,7 @@ class _TabNavigatorState extends State<TabNavigator> {
           children: <Widget>[
             MainPage(),
             SearchHelpPage(),
-            SearchHelpPage(),
+            AppliedServicePage(),
             SearchPage(
               hideLeft: true,
             ),
