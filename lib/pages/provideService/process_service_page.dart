@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fyp_yzj/config/graphqlClient.dart';
+import 'package:fyp_yzj/model/applied_model.dart';
 import 'package:fyp_yzj/model/friend_model.dart';
 import 'package:fyp_yzj/pages/main/widget/add_friend_widget.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -12,15 +13,19 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class FriendListWidget extends StatefulWidget {
+class ProcessServicePage extends StatefulWidget {
+  final String id;
+  final String service_name;
+
+  const ProcessServicePage({Key key, this.id, this.service_name})
+      : super(key: key);
+
   @override
   _FriendListWidget createState() => _FriendListWidget();
 }
 
-class _FriendListWidget extends State<FriendListWidget> {
-  FriendModel _friends;
-  FriendItem _currentContact;
-  bool _isReady = false;
+class _FriendListWidget extends State<ProcessServicePage> {
+  AppliedModel _applied;
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -28,48 +33,49 @@ class _FriendListWidget extends State<FriendListWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getVideos();
+    _getApplied();
   }
 
-  void _getVideos() async {
+  void _getApplied() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final result = await GraphqlClient.getNewClient().query(
       QueryOptions(
         documentNode: gql('''
-            query getUser(\$username:String!) {
-              getUser(username: \$username) {
-                friends{
-                  name
-                  phone
+            query getApplied {
+              getApplied {
+                id
+                appliedUser {
                   profile
-                }
-                currentFriend{
-                  name
+                  username
+                  password
+                  email
+                  gender
                   phone
-                  profile
+                  isVerified
+                  code
                 }
+                firstName
+                lastName
+                address
+                address2
+                city
+                state
+                zip
+                phone
+                description
+                service_id
+                status
               }
             }
           '''),
-        variables: {'username': prefs.getString('name')},
       ),
     );
     if (result.hasException) throw result.exception;
-    if (result.data["getUser"] != null) {
+    if (result.data["getApplied"] != null) {
       setState(() {
-        _friends = FriendModel.fromJson(result.data["getUser"]);
+        _applied = AppliedModel.fromJson(result.data);
       });
     }
-    if (result.data["getUser"]["currentFriend"] != null) {
-      setState(() {
-        _currentContact =
-            FriendItem.fromJson(result.data["getUser"]["currentFriend"]);
-        prefs.setString("currentEmergencyContact", _currentContact.phone);
-      });
-    }
-    setState(() {
-      _isReady = true;
-    });
   }
 
   @override
@@ -78,47 +84,30 @@ class _FriendListWidget extends State<FriendListWidget> {
       color: Colors.black,
       child: Scrollbar(
         // 显示进度条
-        child: _isReady
+        child: _applied != null
             ? SingleChildScrollView(
                 padding: EdgeInsets.all(16.0),
                 child: Center(
                   child: Column(
                     children: [
+                      _getContactListRow("Unprocessed"),
                       SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom:
-                                BorderSide(color: Color(0xff1a1a1a), width: 1),
-                          ),
-                        ),
-                        height: 30,
-                        width: MediaQuery.of(context).size.width,
-                        child: Text("Current emergency contact:",
-                            style: TextStyle(
-                              color: Colors.white,
-                            )),
-                      ),
-                      _getFriendListItem(
-                        context,
-                        _currentContact == null
-                            ? "Not set"
-                            : _currentContact.name,
-                        _currentContact == null
-                            ? "Not set"
-                            : _currentContact.phone,
-                        profile: _currentContact == null
-                            ? "https://pic2.zhimg.com/v2-639b49f2f6578eabddc458b84eb3c6a1.jpg"
-                            : _currentContact.profile,
-                        isCurrent: true,
-                      ),
-                      SizedBox(height: 15),
-                      _getContactListRow(),
-                      for (var i in _friends.friends)
-                        if (_currentContact == null ||
-                            i.phone != _currentContact.phone)
-                          _getFriendListItem(context, i.name, i.phone,
-                              profile: i.profile)
+                      for (var i in _applied.services)
+                        if (i.serviceId == widget.id &&
+                            i.status == "processing")
+                          _getAppliedListItem(context, i, profile: null),
+                      SizedBox(height: 20),
+                      _getContactListRow("Success"),
+                      SizedBox(height: 8),
+                      for (var i in _applied.services)
+                        if (i.serviceId == widget.id && i.status == "success")
+                          _getAppliedListItem(context, i, profile: null),
+                      SizedBox(height: 20),
+                      _getContactListRow("Failed"),
+                      SizedBox(height: 8),
+                      for (var i in _applied.services)
+                        if (i.serviceId == widget.id && i.status == "failed")
+                          _getAppliedListItem(context, i, profile: null)
                     ],
                   ),
                 ),
@@ -132,8 +121,8 @@ class _FriendListWidget extends State<FriendListWidget> {
     );
   }
 
-  Widget _getFriendListItem(BuildContext context, String name, String phone,
-      {String profile, bool isCurrent = false}) {
+  Widget _getAppliedListItem(BuildContext context, AppliedItem applied,
+      {String profile}) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -149,9 +138,9 @@ class _FriendListWidget extends State<FriendListWidget> {
             child: CircleAvatar(
               radius: 25,
               backgroundImage: NetworkImage(
-                profile == null
+                applied.appliedUser.profile == null
                     ? 'https://pic2.zhimg.com/v2-639b49f2f6578eabddc458b84eb3c6a1.jpg'
-                    : profile,
+                    : applied.appliedUser.profile,
               ),
             ),
           ),
@@ -160,16 +149,52 @@ class _FriendListWidget extends State<FriendListWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 5),
-              Text(
-                name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
+              GestureDetector(
+                onTap: () {
+                  EasyDialog(
+                    height: 330,
+                    title: Text(
+                      "Application detail",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    contentList: [
+                      _getDetailItem("First Name: ", applied.firstName),
+                      SizedBox(height: 5),
+                      _getDetailItem("Last Name: ", applied.lastName),
+                      SizedBox(height: 5),
+                      _getDetailItem("Phone: ", applied.phone),
+                      SizedBox(height: 5),
+                      _getDetailItem("Address: ", applied.address),
+                      SizedBox(height: 5),
+                      _getDetailItem("Address2: ", applied.address2),
+                      SizedBox(height: 5),
+                      _getDetailItem("City: ", applied.city),
+                      SizedBox(height: 5),
+                      _getDetailItem("State: ", applied.state),
+                      SizedBox(height: 5),
+                      _getDetailItem("Zip: ", applied.zip),
+                      SizedBox(height: 5),
+                      _getDetailItem("Description: ", ""),
+                      Container(
+                        child: Text(applied.description,
+                            style: TextStyle(fontSize: 15)),
+                      ),
+                      SizedBox(height: 5),
+                    ],
+                  ).show(context);
+                },
+                child: Text(
+                  applied.firstName + " " + applied.lastName,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
                 ),
               ),
               SizedBox(height: 5),
               Text(
-                phone,
+                applied.city,
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 13,
@@ -178,30 +203,42 @@ class _FriendListWidget extends State<FriendListWidget> {
             ],
           ),
           Expanded(child: Container()),
-          IconButton(
-            icon: Icon(
-              Icons.circle_notifications,
-              color: isCurrent ? Colors.red : Color(0xff008AF3),
-              size: 25,
+          if (applied.status == "processing")
+            IconButton(
+              icon: Icon(
+                Icons.check_circle,
+                color: Color(0xff008AF3),
+                size: 25,
+              ),
+              onPressed: () {
+                _processService("success", applied.id);
+              },
             ),
-            onPressed: () {
-              _changeCurrent(phone);
-            },
-          ),
+          if (applied.status == "processing")
+            IconButton(
+              icon: Icon(
+                Icons.cancel,
+                color: Colors.red,
+                size: 25,
+              ),
+              onPressed: () {
+                _processService("failed", applied.id);
+              },
+            ),
         ],
       ),
     );
   }
 
-  void _changeCurrent(String phone) {
+  void _processService(String status, String id) {
     EasyDialog(
         title: Text(
-          "Replace Emergency Contact",
+          "Process service",
           style: TextStyle(fontWeight: FontWeight.bold),
           textScaleFactor: 1.2,
         ),
         description: Text(
-          "Do you want to replace Current Emergency Contact with this one?",
+          "Do you want to change the service status to " + status + "?",
           textScaleFactor: 1.1,
           textAlign: TextAlign.center,
         ),
@@ -214,7 +251,7 @@ class _FriendListWidget extends State<FriendListWidget> {
                 padding: const EdgeInsets.only(top: 8.0),
                 textColor: Colors.lightBlue,
                 onPressed: () {
-                  _changeAccept(phone);
+                  _changeAccept(status, id);
                   Navigator.of(context).pop();
                 },
                 child: new Text(
@@ -238,16 +275,13 @@ class _FriendListWidget extends State<FriendListWidget> {
         ]).show(context);
   }
 
-  void _changeAccept(String phone) async {
+  void _changeAccept(String status, String id) async {
     final SharedPreferences prefs = await _prefs;
 
     var response = await http.post(
-      env['API_SERVER'] + "/friend/changeCurrent",
+      env['API_SERVER'] + "/service/processService",
       headers: {"Content-Type": "application/json"},
-      body: json.encode({
-        "username": prefs.getString("name"),
-        "phone": phone,
-      }),
+      body: json.encode({"id": id, "status": status}),
     );
 
     var result = jsonDecode(response.body);
@@ -264,7 +298,7 @@ class _FriendListWidget extends State<FriendListWidget> {
           textAlign: TextAlign.center,
         ),
       ).show(context);
-      _getVideos();
+      _getApplied();
     } else {
       EasyDialog(
         title: Text(
@@ -281,7 +315,7 @@ class _FriendListWidget extends State<FriendListWidget> {
     }
   }
 
-  Widget _getContactListRow() {
+  Widget _getContactListRow(String title) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -293,30 +327,26 @@ class _FriendListWidget extends State<FriendListWidget> {
       child: Row(
         children: [
           Text(
-            "contact list:",
+            title,
             style: TextStyle(
               color: Colors.white,
               fontSize: 15,
             ),
           ),
-          SizedBox(width: 10),
-          IconButton(
-            icon: Icon(
-              Icons.person_add_alt,
-              color: Color(0xff008AF3),
-              size: 20,
-            ),
-            onPressed: () {
-              showBarModalBottomSheet(
-                expand: true,
-                context: context,
-                backgroundColor: Colors.transparent,
-                builder: (context) => AddFriendWidget(),
-              ).then((value) => {_getVideos()});
-            },
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _getDetailItem(String title, String content) {
+    return Row(
+      children: [
+        Text(title,
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        Container(
+          child: Text(content, style: TextStyle(fontSize: 15)),
+        )
+      ],
     );
   }
 }

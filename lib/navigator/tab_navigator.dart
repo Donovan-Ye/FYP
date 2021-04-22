@@ -1,4 +1,5 @@
 import 'package:fyp_yzj/pages/appliedService/appliedServicePage.dart';
+import 'package:fyp_yzj/pages/provideService/provide_service_page.dart';
 import 'package:fyp_yzj/pages/searchService/search_service_page.dart';
 import 'package:fyp_yzj/pages/my/my_page.dart';
 import 'package:fyp_yzj/pages/search/search_page.dart';
@@ -47,6 +48,7 @@ class _TabNavigatorState extends State<TabNavigator> {
     const Color(0xFFE4EDF5),
     const Color(0xFFE7EEED),
     const Color(0xFFF4E4CE),
+    const Color(0xFFF4E4CE),
   ];
 
   final PageController _controller = PageController(
@@ -69,9 +71,7 @@ class _TabNavigatorState extends State<TabNavigator> {
             MainPage(),
             SearchHelpPage(),
             AppliedServicePage(),
-            SearchPage(
-              hideLeft: true,
-            ),
+            ProvideServicePage(),
             MyPage(),
           ],
         ),

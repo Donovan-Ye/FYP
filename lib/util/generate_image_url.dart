@@ -16,7 +16,9 @@ class GenerateImageUrl {
   Future<void> call(String fileType, String username,
       {String friendName,
       String friendPhone,
-      bool isChangeProfile = false}) async {
+      bool isChangeProfile = false,
+      bool isPostService = false,
+      String serviceId}) async {
     try {
       var response = await http.post(
         env['API_SERVER'] + "/generatePresignedUrl",
@@ -24,7 +26,9 @@ class GenerateImageUrl {
         body: json.encode({
           "fileType": fileType,
           "username": username,
+          "isPostService": isPostService,
           "isChangeProfile": isChangeProfile,
+          "serviceId": serviceId,
           "friendInfo": {
             "name": friendName,
             "phone": friendPhone,
