@@ -63,7 +63,7 @@ class _MainPageState extends State<MainPage> {
   int _start = 10;
 
   bool _isPicoVoiceRunning = false;
-
+  bool _isAlertShow = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -75,6 +75,7 @@ class _MainPageState extends State<MainPage> {
     });
 
     _initPicovoice();
+    Timer(Duration(seconds: 1), () => {_showMainAlert()});
   }
 
   @override
@@ -82,6 +83,67 @@ class _MainPageState extends State<MainPage> {
     _timer.cancel();
     _picovoiceManager?.delete();
     super.dispose();
+  }
+
+  _showMainAlert() async {
+    final SharedPreferences prefs = await _prefs;
+    // prefs.setBool("isShowMainAlert", false);
+    if (prefs.getBool("isShowMainAlert") != true) {
+      EasyDialog(
+        title: Text(
+          "Welcome to Patronus!",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        height: 400,
+        contentList: [
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: RichText(
+              textAlign: TextAlign.justify,
+              text: TextSpan(children: [
+                TextSpan(
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  text:
+                      "The Patronus app wants to better protect your safety. So we used the function of voice recognition to trigger the alarm. But in order to protect your privacy, we have set a switch for voice recognition. If you want to turn on voice recognition, click ",
+                ),
+                WidgetSpan(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      margin: EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: Colors.white,
+                      ),
+                      child: Icon(Icons.keyboard_voice),
+                    ),
+                  ),
+                ),
+                TextSpan(
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  text:
+                      "\n\nWhen you need to ask for help and record the evidence, please say the key word——\"",
+                ),
+                TextSpan(
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                    text: "Patronus"),
+                TextSpan(
+                    style: TextStyle(color: Colors.black, fontSize: 16),
+                    text:
+                        "\", and then follow the command, such as help, stop, to trigger the help function."),
+              ]),
+            ),
+          )
+        ],
+      ).show(context);
+      prefs.setBool("isShowMainAlert", true);
+    }
   }
 
   @override
@@ -131,6 +193,7 @@ class _MainPageState extends State<MainPage> {
                   EasyLoading.showInfo('Stop voice listening.');
                   _picovoiceManager.stop();
                 } else {
+                  _showVoiceRecogAlert();
                   EasyLoading.showSuccess('Start voice listening.');
                   _picovoiceManager.start();
                 }
@@ -240,6 +303,45 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
     );
+  }
+
+  _showVoiceRecogAlert() async {
+    final SharedPreferences prefs = await _prefs;
+    // prefs.setBool("isShowVioceAlert", false);
+    if (prefs.getBool("isShowVioceAlert") != true) {
+      EasyDialog(
+        title: Text(
+          "First time to use Voice Recognition",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        height: 230,
+        contentList: [
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: RichText(
+              textAlign: TextAlign.justify,
+              text: TextSpan(children: [
+                TextSpan(
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  text:
+                      "This is your first time using voice recognition. In order to allow you to use it normally when in danger.\n\nSo, we hope you will try it now. Please say \"",
+                ),
+                TextSpan(
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                    text: "Patronus, help me."),
+                TextSpan(
+                    style: TextStyle(color: Colors.black, fontSize: 16),
+                    text: "\", to trigger a security alert."),
+              ]),
+            ),
+          )
+        ],
+      ).show(context);
+    }
   }
 
   final SmsSendStatusListener listener = (SendStatus status) {
@@ -425,7 +527,7 @@ class _MainPageState extends State<MainPage> {
     try {
       _picovoiceManager = await PicovoiceManager.create(
           keywordPath, _wakeWordCallback, contextPath, _inferenceCallback);
-      _picovoiceManager.start();
+      // _picovoiceManager.start();
     } on PvError catch (ex) {
       print(ex);
     }
@@ -435,12 +537,67 @@ class _MainPageState extends State<MainPage> {
     print("wake word detected!");
   }
 
-  void _inferenceCallback(Map<String, dynamic> inference) {
+  void _inferenceCallback(Map<String, dynamic> inference) async {
     print(inference);
     print(inference["isUnderstood"]);
     if (inference["isUnderstood"] && inference["intent"] == "searchHelp") {
-      _alarmDialog(context);
+      final SharedPreferences prefs = await _prefs;
+      if (prefs.getBool("isShowVioceAlert") != true) {
+        Navigator.of(context).pop();
+        _showVoiceRightAlert();
+        prefs.setBool("isShowVioceAlert", true);
+      } else {
+        _alarmDialog(context);
+      }
     }
+  }
+
+  _showVoiceRightAlert() async {
+    EasyDialog(
+      topImage: AssetImage("assets/images/icon/patronus_part.jpg"),
+      title: Text(
+        "Congradutaion!",
+        style: TextStyle(fontWeight: FontWeight.bold),
+        textScaleFactor: 1.2,
+      ),
+      height: 380,
+      contentList: [
+        Container(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: RichText(
+            textAlign: TextAlign.justify,
+            text: TextSpan(children: [
+              TextSpan(
+                style: TextStyle(color: Colors.black, fontSize: 16),
+                text:
+                    "You already know how to use voice recognition.\n\nOf course, if you want to close it,",
+              ),
+              TextSpan(
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                  text: "please click on the icon in the same location."),
+              WidgetSpan(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    margin: EdgeInsets.only(top: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.red,
+                    ),
+                    child: Icon(Icons.mic_off_outlined),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        )
+      ],
+    ).show(context);
   }
 
   Future<String> _extractAsset(String resourcePath) async {
