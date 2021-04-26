@@ -1,3 +1,4 @@
+import 'package:fyp_yzj/pages/signup/user_type_page.dart';
 import 'package:fyp_yzj/widget/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -95,7 +96,7 @@ class _LogInPageState extends State<LogInPage> {
                 textAlign: TextAlign.center,
               ),
               onTap: () {
-                Get.toNamed(SignUpPage.routeName);
+                Get.toNamed(UserTypePage.routeName);
               },
             ),
           ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_yzj/pages/signup/gender_page.dart';
+import 'package:fyp_yzj/pages/signup/user_type_page.dart';
 import 'package:fyp_yzj/pages/welcome/welcome_page.dart';
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
@@ -29,6 +31,10 @@ class FypRouter {
         return VerificationCodePage.route();
       case VideoListPage.routeName:
         return VideoListPage.route();
+      case UserTypePage.routeName:
+        return UserTypePage.route();
+      case GenderPage.routeName:
+        return GenderPage.route();
       default:
         return _errorRoute();
     }

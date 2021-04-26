@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:fyp_yzj/pages/signup/sign_up_page.dart';
+import 'package:fyp_yzj/pages/signup/user_type_page.dart';
 import 'package:get/get.dart';
 import 'package:fyp_yzj/widget/text_divider.dart';
 
@@ -67,7 +68,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   textAlign: TextAlign.center,
                 ),
                 onTap: () {
-                  Get.toNamed(SignUpPage.routeName);
+                  Get.toNamed(UserTypePage.routeName);
                 },
               ),
             ),
