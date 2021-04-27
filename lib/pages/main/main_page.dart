@@ -95,7 +95,7 @@ class _MainPageState extends State<MainPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
           textScaleFactor: 1.2,
         ),
-        height: 400,
+        height: 250,
         contentList: [
           Container(
             padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -122,21 +122,6 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                 ),
-                TextSpan(
-                  style: TextStyle(color: Colors.black, fontSize: 16),
-                  text:
-                      "\n\nWhen you need to ask for help and record the evidence, please say the key word——\"",
-                ),
-                TextSpan(
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                    text: "Patronus"),
-                TextSpan(
-                    style: TextStyle(color: Colors.black, fontSize: 16),
-                    text:
-                        "\", and then follow the command, such as help, stop, to trigger the help function."),
               ]),
             ),
           )
@@ -544,12 +529,54 @@ class _MainPageState extends State<MainPage> {
       final SharedPreferences prefs = await _prefs;
       if (prefs.getBool("isShowVioceAlert") != true) {
         Navigator.of(context).pop();
+        _showFriendAlert();
         _showVoiceRightAlert();
         prefs.setBool("isShowVioceAlert", true);
       } else {
         _alarmDialog(context);
       }
     }
+  }
+
+  _showFriendAlert() async {
+    EasyDialog(
+      title: Text(
+        "Last thing before using Patronus",
+        style: TextStyle(fontWeight: FontWeight.bold),
+        textScaleFactor: 1.2,
+      ),
+      height: 250,
+      contentList: [
+        Container(
+          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: RichText(
+            textAlign: TextAlign.justify,
+            text: TextSpan(children: [
+              TextSpan(
+                style: TextStyle(color: Colors.black, fontSize: 16),
+                text:
+                    "After the alarm being triggered, the help message including the location will be sent to your preset emergency contact. \n\nSo, if you want to preset one or more emergency contacts before using, click ",
+              ),
+              WidgetSpan(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    margin: EdgeInsets.only(top: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.white,
+                    ),
+                    child: Icon(Icons.hail),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        )
+      ],
+    ).show(context);
   }
 
   _showVoiceRightAlert() async {

@@ -161,6 +161,9 @@ class _ProvideServicePageState extends State<ProvideServicePage> {
           : SingleChildScrollView(
               child: Column(
                 children: [
+                  if (!_services.services.any((s) =>
+                      s.provider_username == username && s.is_deleted != true))
+                    _getNotProvidedWidget(),
                   for (var s in _services.services)
                     if (s.provider_username == username && s.is_deleted != true)
                       _getAppliedItem(s.poster_path, s.name, s.release_date,
@@ -171,8 +174,86 @@ class _ProvideServicePageState extends State<ProvideServicePage> {
     );
   }
 
+  Widget _getNotProvidedWidget() {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "You haven't provided any help yet~",
+                style: TextStyle(color: Colors.white, fontSize: 15),
+              ),
+              SizedBox(height: 7),
+              Text(
+                "Publish services and give others a little warmth.",
+                style: TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              SizedBox(height: 7),
+              ElevatedButton(
+                child: Text("Provide help now"),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.blue),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            side: BorderSide(color: Colors.blue)))),
+                onPressed: () async {
+                  showBarModalBottomSheet(
+                    expand: true,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => AddServicePage(),
+                  ).then((value) => {_getServices()});
+                },
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 20,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.yellow,
+                    ),
+                  ),
+                  SizedBox(width: 3),
+                  Text(
+                    "Good Services",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  SizedBox(width: 3),
+                  Container(
+                    width: 20,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.yellow,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              for (var s in _services.services)
+                if (s.is_deleted != true)
+                  _getAppliedItem(
+                      s.poster_path, s.name, s.release_date, s.overview, s.id,
+                      isExample: true),
+              SizedBox(height: 100)
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
   Widget _getAppliedItem(
-      String poster, String name, String data, String overview, String id) {
+      String poster, String name, String data, String overview, String id,
+      {bool isExample = false}) {
     return Container(
       margin: EdgeInsets.only(top: 10),
       child: Stack(
@@ -218,47 +299,50 @@ class _ProvideServicePageState extends State<ProvideServicePage> {
                     style: TextStyle(fontSize: 17, color: Colors.white)),
               ),
               SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    child: Text("Delete"),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.red),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(color: Colors.red)))),
-                    onPressed: () {
-                      _deleteService(id);
-                    },
-                  ),
-                  SizedBox(width: 10),
-                ],
-              )
+              if (!isExample)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      child: Text("Delete"),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.red),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(color: Colors.red)))),
+                      onPressed: () {
+                        _deleteService(id);
+                      },
+                    ),
+                    SizedBox(width: 10),
+                  ],
+                )
             ],
           ),
-          Positioned(
-            right: 5,
-            child: IconButton(
-              icon: Icon(
-                Icons.mark_email_unread,
-                color: Colors.white,
+          if (!isExample)
+            Positioned(
+              right: 5,
+              child: IconButton(
+                icon: Icon(
+                  Icons.mark_email_unread,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  showBarModalBottomSheet(
+                    expand: true,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => ProcessServicePage(
+                      id: id,
+                      service_name: name,
+                    ),
+                  );
+                },
               ),
-              onPressed: () {
-                showBarModalBottomSheet(
-                  expand: true,
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => ProcessServicePage(
-                    id: id,
-                    service_name: name,
-                  ),
-                );
-              },
-            ),
-          )
+            )
         ],
       ),
     );

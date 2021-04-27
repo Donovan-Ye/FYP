@@ -1,4 +1,6 @@
+import 'package:easy_dialog/easy_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp_yzj/pages/login/log_in_page.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter_verification_box/verification_box.dart';
@@ -99,22 +101,49 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
                 if (result.hasException) throw result.exception;
                 print(result.data);
                 if (result.data["verifyCode"]["status"]) {
-                  Get.toNamed(TabNavigator.routeName);
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            title: Text('Error!'),
-                            content: Text(result.data["verifyCode"]["message"]),
-                            actions: <Widget>[
-                              new FlatButton(
-                                child: new Text("OK"),
-                                onPressed: () {
-                                  Get.back();
-                                },
+                  EasyDialog(
+                      title: Text(
+                        "Success",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textScaleFactor: 1.2,
+                      ),
+                      height: 160,
+                      description: Text(
+                        "verify successfully. Now log in and enjoy!",
+                        textScaleFactor: 1.1,
+                        textAlign: TextAlign.center,
+                      ),
+                      contentList: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            new FlatButton(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              textColor: Colors.lightBlue,
+                              onPressed: () {
+                                Get.toNamed(LogInPage.routeName);
+                              },
+                              child: new Text(
+                                "Yes",
+                                textScaleFactor: 1.2,
                               ),
-                            ],
-                          ));
+                            ),
+                          ],
+                        )
+                      ]).show(context);
+                } else {
+                  EasyDialog(
+                    title: Text(
+                      "Failed",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      textScaleFactor: 1.2,
+                    ),
+                    description: Text(
+                      "verify failed. Please check your email again.",
+                      textScaleFactor: 1.1,
+                      textAlign: TextAlign.center,
+                    ),
+                  ).show(context);
                 }
               }
             },
