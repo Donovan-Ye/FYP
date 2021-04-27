@@ -14,10 +14,10 @@
     
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="fyp_yzj"
+        android:label="Patronus"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/patronus_icon">
 
         <meta-data
         android:name="com.google.android.geo.API_KEY"
