@@ -141,6 +141,7 @@ class _LogInPageState extends State<LogInPage> {
       print(_pwdController.text);
       if (result.data["fetchObjectData"]["status"]) {
         final SharedPreferences prefs = await _prefs;
+        prefs.clear();
         prefs.setString("name", _unameController.text.trim());
         Get.toNamed(TabNavigator.routeName);
       } else {

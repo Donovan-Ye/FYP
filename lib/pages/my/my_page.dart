@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fyp_yzj/config/graphqlClient.dart';
+import 'package:fyp_yzj/pages/signup/gender_page.dart';
 import 'package:fyp_yzj/util/uploadFile.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -110,11 +111,10 @@ class _MyPageState extends State<MyPage> {
               controller: _phoneController,
               columnName: "phone",
             ),
-            _getItemLine(
+            _getGenderLine(
               "Gender",
               gender,
               hasIcon: true,
-              controller: _genderController,
               columnName: "gender",
             ),
             SizedBox(height: 10),
@@ -224,6 +224,63 @@ class _MyPageState extends State<MyPage> {
             : CircleAvatar(
                 backgroundImage: NetworkImage(profile),
               ),
+      ),
+    );
+  }
+
+  Widget _getGenderLine(String title, String content,
+      {bool hasIcon = true, String columnName}) {
+    return Container(
+      height: 45,
+      decoration: BoxDecoration(
+        color: Color(0xff041326),
+        border: Border(
+          bottom: BorderSide(color: Color(0xff1a1a1a), width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 10),
+          Container(
+            width: 45,
+            child: Text(
+              title,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          SizedBox(width: 30),
+          Container(
+            height: 30,
+            child: Center(
+              child: Text(
+                content == null ? "Not Set" : content,
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+          ),
+          Expanded(child: Container()),
+          if (hasIcon)
+            IconButton(
+              icon: Icon(
+                Icons.keyboard_arrow_right,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                showBarModalBottomSheet(
+                  expand: true,
+                  context: context,
+                  builder: (context) => GenderPage(
+                    opener: "my",
+                  ),
+                ).then((value) async {
+                  _uploadMyInfo("gender");
+                });
+              },
+            ),
+          SizedBox(
+            width: 10,
+          )
+        ],
       ),
     );
   }
@@ -380,87 +437,93 @@ class _MyPageState extends State<MyPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
               onPressed: () async {
-                final SharedPreferences prefs = await _prefs;
-
-                var updateBody = {"username": prefs.getString("name")};
-                EasyLoading.show(status: 'Uploading...');
-
-                setState(() {
-                  switch (columnName) {
-                    case "name":
-                      {
-                        name = controller.text;
-                        updateBody["changedName"] = name;
-                      }
-                      break;
-                    case "email":
-                      {
-                        email = controller.text;
-                        updateBody["email"] = email;
-                      }
-                      break;
-                    case "phone":
-                      {
-                        phone = controller.text;
-                        updateBody["phone"] = phone;
-                      }
-                      break;
-                    case "gender":
-                      {
-                        gender = controller.text;
-                        updateBody["gender"] = gender;
-                      }
-                      break;
-                    default:
-                      {
-                        print("something wrong!");
-                      }
-                      break;
-                  }
-                });
-                controller.clear();
-                var response = await http.post(
-                  env['API_SERVER'] + "/user/changeUserInfo",
-                  headers: {"Content-Type": "application/json"},
-                  body: json.encode(updateBody),
-                );
-
-                var result = jsonDecode(response.body);
-
-                EasyLoading.dismiss();
-                Navigator.of(context).pop();
-                print(result["status"]);
-                if (result["status"] == true) {
-                  EasyDialog(
-                    title: Text(
-                      "Success",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      textScaleFactor: 1.2,
-                    ),
-                    description: Text(
-                      "Upload successfully.",
-                      textScaleFactor: 1.1,
-                      textAlign: TextAlign.center,
-                    ),
-                  ).show(context);
-                  prefs.setString("name", name);
-                } else {
-                  EasyDialog(
-                    title: Text(
-                      "Error",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      textScaleFactor: 1.2,
-                    ),
-                    description: Text(
-                      "Uploading failed. Please check your internet.",
-                      textScaleFactor: 1.1,
-                      textAlign: TextAlign.center,
-                    ),
-                  ).show(context);
-                }
+                _uploadMyInfo(columnName, controller: controller);
               }),
         ],
       ),
     );
+  }
+
+  _uploadMyInfo(String columnName, {TextEditingController controller}) async {
+    final SharedPreferences prefs = await _prefs;
+
+    var updateBody = {"username": prefs.getString("name")};
+    EasyLoading.show(status: 'Uploading...');
+
+    setState(() {
+      switch (columnName) {
+        case "name":
+          {
+            name = controller.text;
+            updateBody["changedName"] = name;
+          }
+          break;
+        case "email":
+          {
+            email = controller.text;
+            updateBody["email"] = email;
+          }
+          break;
+        case "phone":
+          {
+            phone = controller.text;
+            updateBody["phone"] = phone;
+          }
+          break;
+        case "gender":
+          {
+            updateBody["gender"] = prefs.getString('gender');
+            setState(() {
+              gender = prefs.getString('gender');
+            });
+          }
+          break;
+        default:
+          {
+            print("something wrong!");
+          }
+          break;
+      }
+    });
+    if (controller != null) controller.clear();
+    var response = await http.post(
+      env['API_SERVER'] + "/user/changeUserInfo",
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(updateBody),
+    );
+
+    var result = jsonDecode(response.body);
+
+    EasyLoading.dismiss();
+    if (columnName != "gender") Navigator.of(context).pop();
+    print(result["status"]);
+    if (result["status"] == true) {
+      EasyDialog(
+        title: Text(
+          "Success",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        description: Text(
+          "Upload successfully.",
+          textScaleFactor: 1.1,
+          textAlign: TextAlign.center,
+        ),
+      ).show(context);
+      prefs.setString("name", name);
+    } else {
+      EasyDialog(
+        title: Text(
+          "Error",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        description: Text(
+          "Uploading failed. Please check your internet.",
+          textScaleFactor: 1.1,
+          textAlign: TextAlign.center,
+        ),
+      ).show(context);
+    }
   }
 }

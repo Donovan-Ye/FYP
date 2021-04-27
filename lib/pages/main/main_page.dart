@@ -87,7 +87,7 @@ class _MainPageState extends State<MainPage> {
 
   _showMainAlert() async {
     final SharedPreferences prefs = await _prefs;
-    // prefs.setBool("isShowMainAlert", false);
+
     if (prefs.getBool("isShowMainAlert") != true) {
       EasyDialog(
         title: Text(

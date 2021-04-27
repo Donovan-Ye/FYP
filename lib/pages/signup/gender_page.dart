@@ -5,7 +5,10 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GenderPage extends StatefulWidget {
+  final String opener;
   static const String routeName = '/gender';
+
+  const GenderPage({Key key, this.opener}) : super(key: key);
 
   static Route route() {
     return MaterialPageRoute(
@@ -155,7 +158,11 @@ class _GenderPageState extends State<GenderPage> {
                                     final SharedPreferences prefs =
                                         await _prefs;
                                     prefs.setString("gender", "Not set");
-                                    Get.toNamed(SignUpPage.routeName);
+                                    if (widget.opener == "my") {
+                                      Get.back();
+                                      Get.back();
+                                    } else
+                                      Get.toNamed(SignUpPage.routeName);
                                   },
                                   child: new Text(
                                     "Accept",
@@ -179,7 +186,13 @@ class _GenderPageState extends State<GenderPage> {
                     } else {
                       final SharedPreferences prefs = await _prefs;
                       prefs.setString("gender", choosedOne);
-                      Get.toNamed(SignUpPage.routeName);
+                      if (widget.opener == "my") {
+                        print("HJHHHH");
+                        Navigator.of(context).pop();
+                      } else {
+                        print("HJHHHadasdasdasdasdH");
+                        Get.toNamed(SignUpPage.routeName);
+                      }
                     }
                   },
                 ),

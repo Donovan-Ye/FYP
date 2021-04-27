@@ -29,7 +29,6 @@ class _VideoListPageState extends State<VideoListPage> {
 
   List _elements;
 
-  List _videos = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -113,84 +112,112 @@ class _VideoListPageState extends State<VideoListPage> {
         direction: SkeletonDirection.ltr,
       );
     } else {
-      return GroupedListView<dynamic, String>(
-        elements: _elements,
-        groupBy: (element) => element['date'].substring(0, 15),
-        groupComparator: (value1, value2) {
-          DateTime d1 = HttpDate.parse(value1.substring(0, 3) +
-              ", " +
-              value1.substring(8, 10) +
-              value1.substring(3, 7) +
-              value2.substring(10, 14) +
-              " 00:00:00 GMT");
-          DateTime d2 = HttpDate.parse(value2.substring(0, 3) +
-              ", " +
-              value2.substring(8, 10) +
-              value2.substring(3, 7) +
-              value2.substring(10, 14) +
-              " 00:00:00 GMT");
-          return d1.compareTo(d2);
-        },
-        itemComparator: (item1, item2) {
-          DateTime d1 = HttpDate.parse(item1['date'].substring(0, 3) +
-              ", " +
-              item1['date'].substring(8, 10) +
-              item1['date'].substring(3, 7) +
-              item1['date'].substring(10, 28));
-          DateTime d2 = HttpDate.parse(item2['date'].substring(0, 3) +
-              ", " +
-              item2['date'].substring(8, 10) +
-              item2['date'].substring(3, 7) +
-              item2['date'].substring(10, 28));
-          return d1.compareTo(d2);
-        },
-        order: GroupedListOrder.DESC,
-        useStickyGroupSeparators: false,
-        groupSeparatorBuilder: (String value) => Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Text(
-            value,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
-        itemBuilder: (c, element) {
-          return Card(
-            elevation: 8.0,
-            margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-            child: Container(
-              child: ListTile(
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                leading: Icon(
-                  Icons.movie,
-                  size: 45,
-                ),
-                title: Text(element['date']),
-                trailing: Icon(Icons.arrow_forward),
-                onTap: () {
-                  EasyLoading.show(status: 'Connecting...');
-
-                  _controller = VideoPlayerController.network(element['url'])
-                    ..initialize().then((_) {
-                      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-                      setState(() {
-                        showCupertinoModalBottomSheet(
-                          expand: true,
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => _getVideoWidget(),
-                        );
-                      });
-                      EasyLoading.dismiss();
-                    });
-                },
+      print(_elements);
+      if (_elements.isEmpty) {
+        return Center(
+          child: Column(
+            children: [
+              SizedBox(height: MediaQuery.of(context).size.height / 4),
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 80,
               ),
+              Container(
+                padding: EdgeInsets.fromLTRB(40, 20, 40, 0),
+                child: Text(
+                  "You haven't recorded any videos yet!",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      } else {
+        return GroupedListView<dynamic, String>(
+          elements: _elements,
+          groupBy: (element) => element['date'].substring(0, 15),
+          groupComparator: (value1, value2) {
+            DateTime d1 = HttpDate.parse(value1.substring(0, 3) +
+                ", " +
+                value1.substring(8, 10) +
+                value1.substring(3, 7) +
+                value2.substring(10, 14) +
+                " 00:00:00 GMT");
+            DateTime d2 = HttpDate.parse(value2.substring(0, 3) +
+                ", " +
+                value2.substring(8, 10) +
+                value2.substring(3, 7) +
+                value2.substring(10, 14) +
+                " 00:00:00 GMT");
+            return d1.compareTo(d2);
+          },
+          itemComparator: (item1, item2) {
+            DateTime d1 = HttpDate.parse(item1['date'].substring(0, 3) +
+                ", " +
+                item1['date'].substring(8, 10) +
+                item1['date'].substring(3, 7) +
+                item1['date'].substring(10, 28));
+            DateTime d2 = HttpDate.parse(item2['date'].substring(0, 3) +
+                ", " +
+                item2['date'].substring(8, 10) +
+                item2['date'].substring(3, 7) +
+                item2['date'].substring(10, 28));
+            return d1.compareTo(d2);
+          },
+          order: GroupedListOrder.DESC,
+          useStickyGroupSeparators: false,
+          groupSeparatorBuilder: (String value) => Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Text(
+              value,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
-          );
-        },
-      );
+          ),
+          itemBuilder: (c, element) {
+            return Card(
+              elevation: 8.0,
+              margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+              child: Container(
+                child: ListTile(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  leading: Icon(
+                    Icons.movie,
+                    size: 45,
+                  ),
+                  title: Text(element['date']),
+                  trailing: Icon(Icons.arrow_forward),
+                  onTap: () {
+                    EasyLoading.show(status: 'Connecting...');
+
+                    _controller = VideoPlayerController.network(element['url'])
+                      ..initialize().then((_) {
+                        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+                        setState(() {
+                          showCupertinoModalBottomSheet(
+                            expand: true,
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => _getVideoWidget(),
+                          );
+                        });
+                        EasyLoading.dismiss();
+                      });
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      }
     }
   }
 
