@@ -2,11 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:fyp_yzj/config/graphqlClient.dart';
+import 'package:fyp_yzj/model/path_model.dart';
 import 'package:fyp_yzj/pages/alarm/alarm_page.dart';
 import 'package:fyp_yzj/pages/fakeCall/fake_call_page.dart';
 import 'package:fyp_yzj/pages/main/widget/friend_list_widget.dart';
+import 'package:fyp_yzj/pages/path/path_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fyp_yzj/pages/main/picker_data.dart';
@@ -16,6 +20,7 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:fyp_yzj/pages/main/widget/map_feature_icon.dart';
 import 'package:fyp_yzj/pages/main/widget/floating_icons.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:io';
@@ -30,6 +35,7 @@ import 'package:picovoice/picovoice_error.dart';
 import 'package:camera/camera.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:telephony/telephony.dart';
+import 'package:http/http.dart' as http;
 
 class MainPage extends StatefulWidget {
   @override
@@ -38,6 +44,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  TextEditingController _nameController = new TextEditingController();
 
   final Telephony telephony = Telephony.instance;
 
@@ -63,11 +70,15 @@ class _MainPageState extends State<MainPage> {
   int _start = 10;
 
   bool _isPicoVoiceRunning = false;
+  bool _isReceivingFriendPath = false;
 
   Map<PolylineId, Polyline> _mapPolylines = {};
   int _polylineIdCounter = 1;
   bool _isDrawRoute = false;
   Timer timer;
+  Timer receivingFriendPathTimer;
+  PathModel _sharedPaths;
+
   final List<LatLng> points = <LatLng>[];
 
   void _add(LatLng lt) {
@@ -108,6 +119,90 @@ class _MainPageState extends State<MainPage> {
     _timer.cancel();
     _picovoiceManager?.delete();
     super.dispose();
+  }
+
+  void _checkFriendPath() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final result = await GraphqlClient.getNewClient().query(
+      QueryOptions(
+        documentNode: gql('''
+            query getSharedPath{
+              getSharedPath{
+                username
+                shared_username
+                path
+              }
+            }
+          '''),
+      ),
+    );
+    if (result.hasException) throw result.exception;
+    if (result.data["getSharedPath"] != null) {
+      setState(() {
+        _sharedPaths = PathModel.fromJson(result.data);
+      });
+      for (var p in _sharedPaths.sharedpaths) {
+        if (p.sharedUsername == prefs.getString("name") &&
+            prefs.getBool("isShowPath") != true) {
+          _showFriendPathAlert(p.username);
+        }
+      }
+    }
+  }
+
+  void _showFriendPathAlert(String username) {
+    EasyDialog(
+        title: Text(
+          "Your friend " + username + " want to share path with you",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        description: Text(
+          "Do you want accept? Once you accpet, Patronus will show the path.",
+          textScaleFactor: 1.1,
+          textAlign: TextAlign.center,
+        ),
+        height: 200,
+        contentList: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              new FlatButton(
+                padding: const EdgeInsets.only(top: 8.0),
+                textColor: Colors.lightBlue,
+                onPressed: () async {
+                  Navigator.of(context).pop();
+
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+
+                  showBarModalBottomSheet(
+                    expand: true,
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => PathPage(),
+                  );
+                  prefs.setBool("isShowPath", true);
+                },
+                child: new Text(
+                  "Accept",
+                  textScaleFactor: 1.2,
+                ),
+              ),
+              new FlatButton(
+                padding: const EdgeInsets.only(top: 8.0),
+                textColor: Colors.lightBlue,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: new Text(
+                  "Cancel",
+                  textScaleFactor: 1.2,
+                ),
+              ),
+            ],
+          )
+        ]).show(context);
   }
 
   _showMainAlert() async {
@@ -206,6 +301,8 @@ class _MainPageState extends State<MainPage> {
               icon2Tap: () async {
                 if (!_isDrawRoute) {
                   _showLocationRouteAlert();
+                  final SharedPreferences prefs = await _prefs;
+
                   setState(() {
                     timer =
                         Timer.periodic(Duration(seconds: 5), (Timer t) async {
@@ -214,6 +311,19 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         mapCenter = LatLng(res.latitude, res.longitude);
                       });
+                      if (_nameController.text != "") {
+                        var response = await http.post(
+                          env['API_SERVER'] + "/path/addToPath",
+                          headers: {"Content-Type": "application/json"},
+                          body: json.encode({
+                            "username": prefs.getString("name"),
+                            "shared_username": _nameController.text,
+                            "path": res.latitude.toString() +
+                                "," +
+                                res.longitude.toString()
+                          }),
+                        );
+                      }
                       _markers.clear();
                       _markers.add(Marker(
                         markerId: MarkerId(
@@ -234,6 +344,14 @@ class _MainPageState extends State<MainPage> {
                   });
                 }
               },
+              icon3Tap: () {
+                showBarModalBottomSheet(
+                  expand: true,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => _getItemChangeArea(_nameController),
+                );
+              },
               icon4Tap: () {
                 if (_isPicoVoiceRunning) {
                   EasyLoading.showInfo('Stop voice listening.');
@@ -251,6 +369,27 @@ class _MainPageState extends State<MainPage> {
                   ? Icon(Icons.keyboard_voice)
                   : Icon(Icons.mic_off_outlined),
               icon4Color: _isPicoVoiceRunning ? Colors.red : Colors.white,
+              icon5: _isReceivingFriendPath
+                  ? Icon(Icons.hearing_outlined)
+                  : Icon(Icons.hearing_disabled_outlined),
+              icon5Color: _isReceivingFriendPath ? Colors.red : Colors.white,
+              icon5Tap: () async {
+                if (_isReceivingFriendPath) {
+                  final SharedPreferences prefs = await _prefs;
+                  receivingFriendPathTimer.cancel();
+                  prefs.setBool("isShowPath", false);
+                  EasyLoading.showInfo('Stop receiving friend path.');
+                } else {
+                  receivingFriendPathTimer =
+                      Timer.periodic(Duration(seconds: 5), (Timer t) async {
+                    _checkFriendPath();
+                  });
+                  EasyLoading.showSuccess('Start receiving friend path.');
+                }
+                setState(() {
+                  _isReceivingFriendPath = !_isReceivingFriendPath;
+                });
+              },
             ),
           )
         ],
@@ -745,5 +884,46 @@ class _MainPageState extends State<MainPage> {
     await outputFile.writeAsBytes(
         buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
     return outputPath;
+  }
+
+  Widget _getItemChangeArea(TextEditingController controller) {
+    return Material(
+      color: Color(0xff222222),
+      child: Column(
+        children: [
+          SizedBox(height: 20),
+          Text(
+            "Please enter the username you want to share your working path:",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          Container(
+            color: Color(0xff1A1A1A),
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: TextField(
+              controller: controller,
+              autofocus: true,
+              style: TextStyle(color: Colors.white, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: "unfilled",
+                hintStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(fontSize: 25),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          RaisedButton(
+              child: Text('Save', style: TextStyle(fontSize: 15)),
+              color: Color(0xff008AF3),
+              padding: EdgeInsets.fromLTRB(130, 14, 130, 14),
+              textColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+              }),
+        ],
+      ),
+    );
   }
 }

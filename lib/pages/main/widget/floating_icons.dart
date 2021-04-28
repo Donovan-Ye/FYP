@@ -6,10 +6,13 @@ class FloatingIcons extends StatefulWidget {
   final Function icon2Tap;
   final Function icon3Tap;
   final Function icon4Tap;
+  final Function icon5Tap;
   final Icon icon2;
   final Color icon2Color;
   final Icon icon4;
   final Color icon4Color;
+  final Icon icon5;
+  final Color icon5Color;
 
   const FloatingIcons({
     Key key,
@@ -21,6 +24,9 @@ class FloatingIcons extends StatefulWidget {
     this.icon4Color,
     this.icon2,
     this.icon2Color,
+    this.icon5Tap,
+    this.icon5,
+    this.icon5Color,
   }) : super(key: key);
 
   @override
@@ -36,6 +42,7 @@ class _FloatingIcons extends State<FloatingIcons> {
         _floatingIcon(widget.icon2, widget.icon2Color, tap: widget.icon2Tap),
         _floatingIcon(Icon(Icons.wifi), Colors.white, tap: widget.icon3Tap),
         _floatingIcon(widget.icon4, widget.icon4Color, tap: widget.icon4Tap),
+        _floatingIcon(widget.icon5, widget.icon5Color, tap: widget.icon5Tap),
       ],
     );
   }
