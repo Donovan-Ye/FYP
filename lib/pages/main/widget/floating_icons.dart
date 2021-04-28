@@ -6,6 +6,8 @@ class FloatingIcons extends StatefulWidget {
   final Function icon2Tap;
   final Function icon3Tap;
   final Function icon4Tap;
+  final Icon icon2;
+  final Color icon2Color;
   final Icon icon4;
   final Color icon4Color;
 
@@ -17,6 +19,8 @@ class FloatingIcons extends StatefulWidget {
     this.icon4Tap,
     this.icon4,
     this.icon4Color,
+    this.icon2,
+    this.icon2Color,
   }) : super(key: key);
 
   @override
@@ -29,7 +33,7 @@ class _FloatingIcons extends State<FloatingIcons> {
     return Column(
       children: [
         _floatingIcon(Icon(Icons.hail), Colors.white, tap: widget.icon1Tap),
-        _floatingIcon(Icon(Icons.radio), Colors.white, tap: widget.icon2Tap),
+        _floatingIcon(widget.icon2, widget.icon2Color, tap: widget.icon2Tap),
         _floatingIcon(Icon(Icons.wifi), Colors.white, tap: widget.icon3Tap),
         _floatingIcon(widget.icon4, widget.icon4Color, tap: widget.icon4Tap),
       ],

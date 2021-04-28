@@ -63,7 +63,32 @@ class _MainPageState extends State<MainPage> {
   int _start = 10;
 
   bool _isPicoVoiceRunning = false;
-  bool _isAlertShow = false;
+
+  Map<PolylineId, Polyline> _mapPolylines = {};
+  int _polylineIdCounter = 1;
+  bool _isDrawRoute = false;
+  Timer timer;
+  final List<LatLng> points = <LatLng>[];
+
+  void _add(LatLng lt) {
+    points.add(lt);
+    final String polylineIdVal = 'polyline_id_$_polylineIdCounter';
+    _polylineIdCounter++;
+    final PolylineId polylineId = PolylineId(polylineIdVal);
+
+    final Polyline polyline = Polyline(
+      polylineId: polylineId,
+      consumeTapEvents: true,
+      color: Colors.red,
+      width: 5,
+      points: points,
+    );
+
+    setState(() {
+      _mapPolylines[polylineId] = polyline;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -118,7 +143,7 @@ class _MainPageState extends State<MainPage> {
                         borderRadius: BorderRadius.circular(50),
                         color: Colors.white,
                       ),
-                      child: Icon(Icons.keyboard_voice),
+                      child: Icon(Icons.mic_off_outlined),
                     ),
                   ),
                 ),
@@ -149,6 +174,7 @@ class _MainPageState extends State<MainPage> {
                       )
                     : GoogleMap(
                         onMapCreated: _onMapCreated,
+                        polylines: Set<Polyline>.of(_mapPolylines.values),
                         initialCameraPosition: CameraPosition(
                           target: mapCenter,
                           zoom: 17.0,
@@ -173,6 +199,41 @@ class _MainPageState extends State<MainPage> {
                   builder: (context) => FriendListWidget(),
                 );
               },
+              icon2: _isDrawRoute
+                  ? Icon(Icons.location_on)
+                  : Icon(Icons.location_off),
+              icon2Color: _isDrawRoute ? Colors.red : Colors.white,
+              icon2Tap: () async {
+                if (!_isDrawRoute) {
+                  _showLocationRouteAlert();
+                  setState(() {
+                    timer =
+                        Timer.periodic(Duration(seconds: 5), (Timer t) async {
+                      Position res = await Geolocator.getCurrentPosition();
+                      _add(LatLng(res.latitude, res.longitude));
+                      setState(() {
+                        mapCenter = LatLng(res.latitude, res.longitude);
+                      });
+                      _markers.clear();
+                      _markers.add(Marker(
+                        markerId: MarkerId(
+                            LatLng(res.latitude, res.longitude).toString()),
+                        position: LatLng(res.latitude, res.longitude),
+                        infoWindow: InfoWindow(
+                          title: 'I am here',
+                        ),
+                        icon: customIcon,
+                      ));
+                    });
+                    _isDrawRoute = true;
+                  });
+                } else {
+                  timer.cancel();
+                  setState(() {
+                    _isDrawRoute = false;
+                  });
+                }
+              },
               icon4Tap: () {
                 if (_isPicoVoiceRunning) {
                   EasyLoading.showInfo('Stop voice listening.');
@@ -187,8 +248,8 @@ class _MainPageState extends State<MainPage> {
                 });
               },
               icon4: _isPicoVoiceRunning
-                  ? Icon(Icons.mic_off_outlined)
-                  : Icon(Icons.keyboard_voice),
+                  ? Icon(Icons.keyboard_voice)
+                  : Icon(Icons.mic_off_outlined),
               icon4Color: _isPicoVoiceRunning ? Colors.red : Colors.white,
             ),
           )
@@ -326,6 +387,51 @@ class _MainPageState extends State<MainPage> {
           )
         ],
       ).show(context);
+    }
+  }
+
+  _showLocationRouteAlert() async {
+    final SharedPreferences prefs = await _prefs;
+    if (prefs.getBool("isShowLocationAlert") != true) {
+      EasyDialog(
+        title: Text(
+          "First time to use Location sharing",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textScaleFactor: 1.2,
+        ),
+        height: 230,
+        contentList: [
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: RichText(
+              textAlign: TextAlign.justify,
+              text: TextSpan(children: [
+                TextSpan(
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  text:
+                      "After you open the location monitoring, we will record your moving path, and draw it in the map. \n If you want to close it, click ",
+                ),
+                WidgetSpan(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      margin: EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: Colors.red,
+                      ),
+                      child: Icon(Icons.location_on),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          )
+        ],
+      ).show(context);
+      prefs.setBool("isShowLocationAlert", true);
     }
   }
 
@@ -616,7 +722,7 @@ class _MainPageState extends State<MainPage> {
                       borderRadius: BorderRadius.circular(50),
                       color: Colors.red,
                     ),
-                    child: Icon(Icons.mic_off_outlined),
+                    child: Icon(Icons.keyboard_voice),
                   ),
                 ),
               ),
