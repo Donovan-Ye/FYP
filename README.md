@@ -1,4 +1,4 @@
-# first_app
+# fyp_yzj
 
 A new Flutter project.
 

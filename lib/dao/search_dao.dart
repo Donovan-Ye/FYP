@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:first_app/model/search_model.dart';
+import 'package:fyp_yzj/model/search_model.dart';
 import 'package:http/http.dart' as http;
 
 const SEARCH_URL =

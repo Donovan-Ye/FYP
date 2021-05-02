@@ -1,7 +1,7 @@
-import 'package:first_app/dao/search_dao.dart';
-import 'package:first_app/model/search_model.dart';
-import 'package:first_app/widget/search_bar.dart';
-import 'package:first_app/widget/webview.dart';
+import 'package:fyp_yzj/dao/search_dao.dart';
+import 'package:fyp_yzj/model/search_model.dart';
+import 'package:fyp_yzj/widget/search_bar.dart';
+import 'package:fyp_yzj/widget/webview.dart';
 import 'package:flutter/material.dart';
 
 const TYPES = [

@@ -1,76 +1,177 @@
-import 'package:first_app/pages/home_page.dart';
-import 'package:first_app/pages/my_page.dart';
-import 'package:first_app/pages/search_page.dart';
+import 'package:fyp_yzj/pages/appliedService/appliedServicePage.dart';
+import 'package:fyp_yzj/pages/provideService/provide_service_page.dart';
+import 'package:fyp_yzj/pages/searchService/search_service_page.dart';
+import 'package:fyp_yzj/pages/my/my_page.dart';
+import 'package:fyp_yzj/pages/search/search_page.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/pages/map_page.dart';
+import 'package:fyp_yzj/pages/main/main_page.dart';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 
 class TabNavigator extends StatefulWidget {
+  static const String routeName = '/main_tab';
+
+  static Route route() {
+    return MaterialPageRoute(
+        settings: const RouteSettings(name: routeName),
+        builder: (_) => TabNavigator());
+  }
+
   @override
   _TabNavigatorState createState() => _TabNavigatorState();
 }
 
 class _TabNavigatorState extends State<TabNavigator> {
-  final _defaultColor = Colors.grey;
-  final _activeColor = Color(0xff03DAC5);
-  int _currentIndex = 0;
+  final BorderRadius _borderRadius = const BorderRadius.only(
+    topLeft: Radius.circular(25),
+    topRight: Radius.circular(25),
+  );
+
+  ShapeBorder bottomBarShape = const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(25)),
+  );
+  SnakeBarBehaviour snakeBarStyle = SnakeBarBehaviour.floating;
+  EdgeInsets padding = const EdgeInsets.all(12);
+
+  int _selectedItemPosition = 0;
+  SnakeShape snakeShape = SnakeShape.circle;
+
+  bool showSelectedLabels = false;
+  bool showUnselectedLabels = false;
+
+  Color selectedColor = Colors.black;
+
+  Color containerColor;
+  List<Color> containerColors = [
+    const Color(0xFFFDE1D7),
+    const Color(0xFFE4EDF5),
+    const Color(0xFFE7EEED),
+    const Color(0xFFF4E4CE),
+    const Color(0xFFF4E4CE),
+  ];
+
   final PageController _controller = PageController(
     initialPage: 0,
   );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _controller,
-        children: <Widget>[
-          MapPage(),
-          HomePage(),
-          SearchPage(
-            hideLeft: true,
-          ),
-          MyPage(),
-        ],
+      extendBodyBehindAppBar: true,
+      resizeToAvoidBottomInset: true,
+      extendBody: true,
+      body: AnimatedContainer(
+        color: containerColor ?? containerColors[0],
+        duration: const Duration(seconds: 1),
+        child: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          onPageChanged: _onPageChanged,
+          controller: _controller,
+          children: <Widget>[
+            MainPage(),
+            SearchHelpPage(),
+            AppliedServicePage(),
+            ProvideServicePage(),
+            MyPage(),
+          ],
+        ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+      bottomNavigationBar: SnakeNavigationBar.color(
+        // height: 80,
+        behaviour: snakeBarStyle,
+        snakeShape: snakeShape,
+        shape: bottomBarShape,
+        padding: padding,
+
+        snakeViewColor: selectedColor,
+        selectedItemColor:
+            snakeShape == SnakeShape.indicator ? selectedColor : null,
+        unselectedItemColor: Colors.blueGrey,
+
+        showUnselectedLabels: showUnselectedLabels,
+        showSelectedLabels: showSelectedLabels,
+
+        currentIndex: _selectedItemPosition,
         onTap: (index) {
           _controller.jumpToPage(index);
-          setState(() {
-            _currentIndex = index;
-          });
+          setState(() => _selectedItemPosition = index);
         },
         items: [
-          BottomNavigationBarItem(
-              backgroundColor: Colors.black,
-              icon: Icon(Icons.home, color: _defaultColor),
-              activeIcon: Icon(Icons.home, color: _activeColor),
-              title: Text('',
-                  style: TextStyle(
-                      color:
-                          _currentIndex != 0 ? _defaultColor : _activeColor))),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search, color: _defaultColor),
-              activeIcon: Icon(Icons.search, color: _activeColor),
-              title: Text('',
-                  style: TextStyle(
-                      color:
-                          _currentIndex != 1 ? _defaultColor : _activeColor))),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt, color: _defaultColor),
-              activeIcon: Icon(Icons.camera_alt, color: _activeColor),
-              title: Text('',
-                  style: TextStyle(
-                      color:
-                          _currentIndex != 2 ? _defaultColor : _activeColor))),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle, color: _defaultColor),
-              activeIcon: Icon(Icons.account_circle, color: _activeColor),
-              title: Text('my',
-                  style: TextStyle(
-                      color:
-                          _currentIndex != 3 ? _defaultColor : _activeColor))),
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.policy), label: 'search_help'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.verified_user), label: 'applied_help'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.add_moderator), label: 'provide_help'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.perm_identity), label: 'my'),
         ],
+        selectedLabelStyle: const TextStyle(fontSize: 14),
+        unselectedLabelStyle: const TextStyle(fontSize: 10),
       ),
     );
+  }
+
+  void _onPageChanged(int page) {
+    containerColor = containerColors[page];
+    switch (page) {
+      case 0:
+        setState(() {
+          snakeBarStyle = SnakeBarBehaviour.floating;
+          snakeShape = SnakeShape.circle;
+          padding = const EdgeInsets.all(12);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
+          showSelectedLabels = false;
+          showUnselectedLabels = false;
+        });
+        break;
+      case 1:
+        setState(() {
+          snakeBarStyle = SnakeBarBehaviour.floating;
+          snakeShape = SnakeShape.circle;
+          padding = const EdgeInsets.all(12);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
+          showSelectedLabels = false;
+          showUnselectedLabels = false;
+        });
+        break;
+
+      case 2:
+        setState(() {
+          snakeBarStyle = SnakeBarBehaviour.floating;
+          snakeShape = SnakeShape.circle;
+          padding = const EdgeInsets.all(12);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
+          showSelectedLabels = false;
+          showUnselectedLabels = false;
+        });
+        break;
+      case 3:
+        setState(() {
+          snakeBarStyle = SnakeBarBehaviour.floating;
+          snakeShape = SnakeShape.circle;
+          padding = const EdgeInsets.all(12);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
+          showSelectedLabels = false;
+          showUnselectedLabels = false;
+        });
+        break;
+      case 4:
+        setState(() {
+          snakeBarStyle = SnakeBarBehaviour.floating;
+          snakeShape = SnakeShape.circle;
+          padding = const EdgeInsets.all(12);
+          bottomBarShape =
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25));
+          showSelectedLabels = false;
+          showUnselectedLabels = false;
+        });
+        break;
+    }
   }
 }
