@@ -47,10 +47,12 @@ class _WelcomePageState extends State<WelcomePage> {
             ),
             const SizedBox(height: 100),
             RaisedButton(
+              key: Key("logInButton"),
               onPressed: () {
                 Get.toNamed(LogInPage.routeName);
               },
-              child: Text('Log In', style: TextStyle(fontSize: 15)),
+              child: Text('Log In',
+                  style: TextStyle(fontSize: 15), key: Key("logInButtonText")),
               color: Color(0xff008AF3),
               padding: EdgeInsets.fromLTRB(150, 15, 150, 15),
               textColor: Colors.white,
@@ -66,6 +68,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   "Sign up with email",
                   style: TextStyle(color: Color(0xff304F9D), fontSize: 12),
                   textAlign: TextAlign.center,
+                  key: Key("signUpTip"),
                 ),
                 onTap: () {
                   Get.toNamed(UserTypePage.routeName);

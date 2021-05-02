@@ -8,22 +8,26 @@ class TextDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Divider(
-          height: 30,
-          color: Color(0xff202020),
-          thickness: 2,
-          indent: 5,
-          endIndent: 5,
+    return MaterialApp(
+      home: Scaffold(
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            Divider(
+              height: 30,
+              color: Color(0xff202020),
+              thickness: 2,
+              indent: 5,
+              endIndent: 5,
+            ),
+            Text(
+              content,
+              style: TextStyle(color: Color(0xff898989), fontSize: 10),
+              textAlign: TextAlign.center,
+            )
+          ],
         ),
-        Text(
-          content,
-          style: TextStyle(color: Color(0xff898989), fontSize: 10),
-          textAlign: TextAlign.center,
-        )
-      ],
+      ),
     );
   }
 }
