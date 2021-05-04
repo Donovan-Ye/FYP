@@ -97,28 +97,49 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 [register-4]: ./assets/readme/register-4.jpg
 [register-5]: ./assets/readme/register-5.jpg
 + user type selection 
+<br>
+
 ![][register-1]
+<br>
+
 + gender selection 
+<br>
+
 ![][register-2]
+<br>
+
 + username, password, email and phone number
+<br>
+
 ![][register-3]
 ![][register-4]
+<br>
+
 + verification code
+<br>
+
 ![][register-5]
 
+<br>
 
 2. log in
 
 [login]: ./assets/readme/login.jpg
 [main-1]: ./assets/readme/main-1.jpg
 [main-2]: ./assets/readme/main-2.jpg
-
 + log in page
+<br>
+
 ![][login]
+<br>
+
 + main page after log in successfully
+<br>
+
 ![][main-1]
 ![][main-2]
 
+<br>
 
 3. voice recognition
 
@@ -132,21 +153,30 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 [voice-8]: ./assets/readme/voice-8.jpg
 [voice-9]: ./assets/readme/voice-9.jpg
 [voice-10]: ./assets/readme/voice-10.jpg
-
-
 + voice recognition tips when log in first time
+<br>
+
 ![][voice-1]
 ![][voice-2]
 ![][voice-3]
 ![][voice-4]
 ![][voice-5]
+<br>
+
 + voice recognition settting
+<br>
+
 ![][voice-7]
 ![][voice-8]
 ![][voice-9]
 ![][voice-10]
+<br>
+
 + integrate with Flutter app
+<br>
+
 ![][voice-6]
+<br>
 
 4. alarm
 
@@ -159,36 +189,50 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 [alarm-7]: ./assets/readme/alarm-7.jpg
 [alarm-8]: ./assets/readme/alarm-8.jpg
 [alarm-9]: ./assets/readme/alarm-9.jpg
-
 + add new friend to send message
+<br>
 
 ![][alarm-5]
 ![][alarm-6]
 ![][alarm-7]
 ![][alarm-8]
+<br>
 
 + replace emergency contact
+<br>
 
 ![][alarm-9]
+<br>
+
 + send message
+<br>
 
 ![][alarm-1]
 ![][alarm-2]
+<br>
 
 + make huge sounds and recording video
+<br>
+
 
 ![][alarm-3]
+<br>
+
 + uploading video 
+<br>
 
 ![][alarm-4]
+<br>
 
 5. video list
+<br>
 
 [list-1]: ./assets/readme/list-1.jpg
 [list-2]: ./assets/readme/list-2.jpg
 
 ![][list-1]
 ![][list-2]
+<br>
 
 6. fake call
 
@@ -197,26 +241,38 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 [fake-3]: ./assets/readme/fake-3.jpg
 [fake-4]: ./assets/readme/fake-4.jpg
 + setting countdown for fake call if you want
+<br>
+
 
 ![][fake-1]
 ![][fake-2]
+<br>
 
 + fake call with sounds
+<br>
+
 
 ![][fake-3]
 ![][fake-4]
+<br>
 
 7. path monitoring
 
 [path-1]: ./assets/readme/path-1.jpg
 [monitor-1]: ./assets/readme/monitor-1.jpg
 [monitor-2]: ./assets/readme/monitor-2.jpg
-
 + First, the sharing user needs to click this button to turn on the path monitoring. 
+<br>
+
 ![][path-1]
+<br>
+
 + then you can see the path after you change the position
+<br>
+
 ![][monitor-1]
 ![][monitor-2]
+<br>
 
 8. path sharing
 
@@ -225,17 +281,32 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 [sharing-3]: ./assets/readme/sharing-3.jpg
 [sharing-4]: ./assets/readme/sharing-4.jpg
 + If you want to share your path with other users, you just need to enter the username, for example "jerry"
+<br>
+
 ![][sharing-1]
+<br>
 
 9. accept friends path sharing
+
 + If you want to share your path with other users, you just need to enter the username, for example "jerry"
+<br>
+
 ![][sharing-2]
+<br>
+
 + Then you will receive the path sharing
+<br>
+
 ![][sharing-3]
+<br>
+
 + path sharing page 
+<br>
+
 ![][sharing-4]
 
 10. provide services
+<br>
 
 [provide-1]: ./assets/readme/provide-1.jpg
 [provide-2]: ./assets/readme/provide-2.jpg
@@ -248,8 +319,10 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 ![][provide-3]
 ![][provide-4]
 ![][provide-5]
+<br>
 
 11. apply services
+<br>
 
 [apply-1]: ./assets/readme/apply-1.jpg
 [apply-2]: ./assets/readme/apply-2.jpg
@@ -258,8 +331,10 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 ![][apply-1]
 ![][apply-2]
 12. application tracking
+<br>
 
 ![][apply-3]
+<br>
 
 13. process application
 
@@ -270,24 +345,36 @@ Because the project is designed to use a Voice AI to implement the feature of vo
 [process-5]: ./assets/readme/process-5.jpg
 [process-6]: ./assets/readme/process-6.jpg
 [process-7]: ./assets/readme/process-7.jpg
-
 + If you want to process the service applied above, you need to log in the provider account.
+<br>
+
 ![][process-1]
 + Then process the application
+<br>
+
 ![][process-2]
 ![][process-3]
 ![][process-4]
 ![][process-5]
 ![][process-6]
+<br>
+
 + Back to original account, see the result of processing
+<br>
+
 ![][process-7]
+<br>
 
 14. check and change personal information
+<br>
 
 [my]: ./assets/readme/my.jpg
 ![][my]
 
+<br>
+
 15. log out
+<br>
 
 [logout]: ./assets/readme/logout.jpg
 ![][logout]
