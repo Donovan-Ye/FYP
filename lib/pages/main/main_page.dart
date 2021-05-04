@@ -728,7 +728,7 @@ class _MainPageState extends State<MainPage> {
                           _timer.cancel();
                           _start = 10;
                           Navigator.of(context).pop();
-                          _setSMS("+353894168881");
+                          _setSMS(prefs.getString('currentEmergencyContact'));
                           _alarm();
                         }
                         timer.cancel();
